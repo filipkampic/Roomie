@@ -1,6 +1,72 @@
 package com.roomie.app.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.roomie.app.features.auth.LoginScreen
+import com.roomie.app.features.auth.RegisterScreen
+import com.roomie.app.features.chores.AddChoreScreen
+import com.roomie.app.features.chores.ChoresScreen
+import com.roomie.app.features.dashboard.DashboardScreen
+import com.roomie.app.features.expenses.AddExpenseScreen
+import com.roomie.app.features.expenses.ExpensesScreen
+import com.roomie.app.features.household.CreateHouseholdScreen
+import com.roomie.app.features.household.HouseholdSetupScreen
+import com.roomie.app.features.household.JoinHouseholdScreen
+import com.roomie.app.features.profile.ProfileScreen
+import com.roomie.app.features.shopping.ShoppingScreen
 
 @Composable
-fun NavGraph() {}
+fun NavGraph(
+    navController: NavHostController = rememberNavController(),
+    startDestination: String = Screen.Login.route
+) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
+        // Auth
+        composable(Screen.Login.route) {
+            LoginScreen(navController = navController)
+        }
+        composable(Screen.Register.route) {
+            RegisterScreen(navController = navController)
+        }
+
+        // Household setup
+        composable(Screen.HouseholdSetup.route) {
+            HouseholdSetupScreen(navController = navController)
+        }
+        composable(Screen.CreateHousehold.route) {
+            CreateHouseholdScreen(navController = navController)
+        }
+        composable(Screen.JoinHousehold.route) {
+            JoinHouseholdScreen(navController = navController)
+        }
+
+        // Main app
+        composable(Screen.Dashboard.route) {
+            DashboardScreen(navController = navController)
+        }
+        composable(Screen.Chores.route) {
+            ChoresScreen(navController = navController)
+        }
+        composable(Screen.AddChore.route) {
+            AddChoreScreen(navController = navController)
+        }
+        composable(Screen.Expenses.route) {
+            ExpensesScreen(navController = navController)
+        }
+        composable(Screen.AddExpense.route) {
+            AddExpenseScreen(navController = navController)
+        }
+        composable(Screen.Shopping.route) {
+            ShoppingScreen(navController = navController)
+        }
+        composable(Screen.Profile.route) {
+            ProfileScreen(navController = navController)
+        }
+    }
+}

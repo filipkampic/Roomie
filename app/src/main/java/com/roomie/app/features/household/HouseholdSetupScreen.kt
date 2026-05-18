@@ -4,4 +4,4 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 
 @Composable
-fun JoinHouseholdScreen(navController: NavHostController) {}
+fun HouseholdSetupScreen(navController: NavHostController) {}

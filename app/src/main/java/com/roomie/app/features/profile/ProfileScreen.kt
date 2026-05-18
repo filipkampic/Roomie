@@ -1,7 +1,7 @@
-package com.roomie.app.features.expenses
+package com.roomie.app.features.profile
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 
 @Composable
-fun ExpensesScreen(navController: NavHostController) {}
+fun ProfileScreen(navController: NavHostController) {}
