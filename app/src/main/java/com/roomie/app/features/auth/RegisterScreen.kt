@@ -119,7 +119,7 @@ fun RegisterScreen(
         }
 
         Button(
-            onClick = { viewModel.register(email, password) },
+            onClick = { viewModel.register(email, password, name) },
             enabled = uiState !is AuthUiState.Loading
                     && name.isNotBlank()
                     && email.isNotBlank()

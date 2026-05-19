@@ -36,11 +36,15 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun register(email: String, password: String) {
+    fun register(email: String, password: String, name: String) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
             authRepository.register(email, password)
-                .onSuccess { _uiState.value = AuthUiState.Success(it) }
+                .onSuccess { user ->
+                    authRepository.saveUser(user.uid, name, email)
+                        .onSuccess { _uiState.value = AuthUiState.Success(user) }
+                        .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "Failed to save user") }
+                }
                 .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "Registration failed") }
         }
     }

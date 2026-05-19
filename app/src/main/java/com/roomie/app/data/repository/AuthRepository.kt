@@ -2,13 +2,16 @@ package com.roomie.app.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
+import com.roomie.app.data.model.User
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AuthRepository @Inject constructor(
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val firestore: FirebaseFirestore
 ) {
     val currentUser: FirebaseUser? get() = auth.currentUser
 
@@ -32,5 +35,15 @@ class AuthRepository @Inject constructor(
 
     fun logout() {
         auth.signOut()
+    }
+
+    suspend fun saveUser(uid: String, name: String, email: String): Result<Unit> {
+        return try {
+            val user = User(id = uid, name = name, email = email)
+            firestore.collection("users").document(uid).set(user).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
