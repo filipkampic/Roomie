@@ -2,7 +2,9 @@ package com.roomie.app.features.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseUser
+import com.roomie.app.core.navigation.Screen
 import com.roomie.app.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,9 +51,12 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun logout() {
+    fun logout(navController: NavHostController) {
         authRepository.logout()
         _uiState.value = AuthUiState.Idle
+        navController.navigate(Screen.Login.route) {
+            popUpTo(0) { inclusive = true }
+        }
     }
 
     fun resetState() {

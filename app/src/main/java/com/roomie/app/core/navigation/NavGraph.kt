@@ -1,10 +1,13 @@
 package com.roomie.app.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.roomie.app.features.auth.AuthViewModel
 import com.roomie.app.features.auth.LoginScreen
 import com.roomie.app.features.auth.RegisterScreen
 import com.roomie.app.features.chores.AddChoreScreen
@@ -20,9 +23,15 @@ import com.roomie.app.features.shopping.ShoppingScreen
 
 @Composable
 fun NavGraph(
-    navController: NavHostController = rememberNavController(),
-    startDestination: String = Screen.Login.route
+    navController: NavHostController = rememberNavController()
 ) {
+    val authViewModel: AuthViewModel = hiltViewModel()
+
+    val startDestination = remember {
+        if (authViewModel.currentUser != null) Screen.Dashboard.route
+        else Screen.Login.route
+    }
+
     NavHost(
         navController = navController,
         startDestination = startDestination
