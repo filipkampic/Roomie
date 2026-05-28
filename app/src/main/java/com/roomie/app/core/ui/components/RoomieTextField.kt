@@ -13,7 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.roomie.app.core.ui.theme.InputBackground
+import com.roomie.app.core.ui.theme.NavyPrimary
 import com.roomie.app.core.ui.theme.NavySecondary
+import com.roomie.app.core.ui.theme.TealPrimary
 
 @Composable
 fun RoomieTextField(
@@ -49,8 +51,11 @@ fun RoomieTextField(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
-            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+            focusedTextColor = NavyPrimary,
+            unfocusedTextColor = NavyPrimary,
+            cursorColor = TealPrimary,
+            focusedPlaceholderColor = NavySecondary,
+            unfocusedPlaceholderColor = NavySecondary
         ),
         textStyle = MaterialTheme.typography.bodyLarge,
         modifier = modifier.fillMaxWidth()

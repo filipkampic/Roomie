@@ -27,20 +27,21 @@ fun RoomieLogo(modifier: Modifier = Modifier) {
             contentDescription = null,
             modifier = Modifier.size(52.dp)
         )
-    }
 
-    Spacer(modifier = Modifier.width(12.dp))
 
-    Column {
-        Text(
-            text = "Roomie",
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = "Smart Roommate Management App",
-            style = MaterialTheme.typography.bodySmall,
-            color = NavySecondary
-        )
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column {
+            Text(
+                text = "Roomie",
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "Smart Roommate\nManagement App",
+                style = MaterialTheme.typography.bodySmall,
+                color = NavySecondary
+            )
+        }
     }
 }
