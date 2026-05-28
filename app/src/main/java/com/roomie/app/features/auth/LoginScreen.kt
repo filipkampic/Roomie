@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.roomie.app.core.navigation.Screen
+import com.roomie.app.core.ui.components.RoomieButton
 import com.roomie.app.core.ui.components.RoomieLogo
 import com.roomie.app.core.ui.components.RoomieTextField
 import com.roomie.app.core.ui.theme.Dimens
@@ -179,6 +180,15 @@ fun LoginScreen(
             }
 
             Spacer(modifier = Modifier.height(Dimens.SpaceLG))
+
+            RoomieButton(
+                text = "Sign In",
+                onClick = { viewModel.login(email, password) },
+                enabled = email.isNotBlank() && password.isNotBlank(),
+                isLoading = uiState is AuthUiState.Loading
+            )
+
+            Spacer(modifier = Modifier.height(Dimens.SpaceMD))
 
             TextButton(onClick = {
                 viewModel.resetState()
