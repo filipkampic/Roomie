@@ -1,5 +1,6 @@
 package com.roomie.app.features.auth
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -28,6 +29,20 @@ class AuthViewModel @Inject constructor(
     val uiState: StateFlow<AuthUiState> = _uiState
 
     val currentUser get() = authRepository.currentUser
+
+    private val _startDestination = MutableStateFlow<String?>(null)
+    val startDestination: StateFlow<String?> = _startDestination
+
+    init {
+        viewModelScope.launch {
+            val destination = when {
+                authRepository.currentUser == null -> Screen.Login.route
+                authRepository.fetchCurrentUserHouseholdId() != null -> Screen.Dashboard.route
+                else -> Screen.HouseholdSetup.route
+            }
+            _startDestination.value = destination
+        }
+    }
 
     fun login(email: String, password: String) {
         viewModelScope.launch {

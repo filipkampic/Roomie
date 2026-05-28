@@ -1,6 +1,5 @@
 package com.roomie.app.data.repository
 
-import android.R.attr.name
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.roomie.app.data.model.Household
@@ -68,5 +67,17 @@ class HouseholdRepository @Inject constructor(
     private fun generateInviteCode(): String {
         val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return (1..6).map { chars.random() }.joinToString("")
+    }
+
+    suspend fun findHouseholdByInviteCode(inviteCode: String): Result<Household?> {
+        return try {
+            val query = householdsCollection
+                .whereEqualTo("inviteCode", inviteCode.uppercase())
+                .get().await()
+            if (query.isEmpty) Result.success(null)
+            else Result.success(query.documents.first().toObject(Household::class.java))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
