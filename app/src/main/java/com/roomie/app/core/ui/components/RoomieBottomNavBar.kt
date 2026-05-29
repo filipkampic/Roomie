@@ -1,13 +1,12 @@
 package com.roomie.app.core.ui.components
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.ShoppingBag
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -17,9 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import com.roomie.app.core.navigation.Screen
 import com.roomie.app.core.ui.theme.Dimens
-import com.roomie.app.core.ui.theme.NavySecondary
 import com.roomie.app.core.ui.theme.RoomieTypography
-import com.roomie.app.core.ui.theme.SurfaceWhite
 import com.roomie.app.core.ui.theme.TealPrimary
 
 data class BottomNavItem(
@@ -50,7 +47,7 @@ fun RoomieBottomNavBar(
     onNavigate: (String) -> Unit
 ) {
     NavigationBar(
-        containerColor = SurfaceWhite,
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = Dimens.CardElevation
     ) {
         bottomNavItems.forEach { item ->
@@ -75,8 +72,8 @@ fun RoomieBottomNavBar(
                     selectedIconColor = TealPrimary,
                     selectedTextColor = TealPrimary,
                     indicatorColor = TealPrimary.copy(alpha = 0.12f),
-                    unselectedIconColor = NavySecondary,
-                    unselectedTextColor = NavySecondary
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             )
         }

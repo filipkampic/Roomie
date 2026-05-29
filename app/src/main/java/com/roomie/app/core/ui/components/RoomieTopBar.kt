@@ -13,6 +13,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -20,9 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
-import com.roomie.app.core.ui.theme.BackgroundLight
 import com.roomie.app.core.ui.theme.Dimens
-import com.roomie.app.core.ui.theme.NavyPrimary
 import com.roomie.app.core.ui.theme.RoomieTypography
 import com.roomie.app.core.ui.theme.SurfaceWhite
 import com.roomie.app.core.ui.theme.TealPrimary
@@ -49,7 +48,7 @@ fun RoomieTopBar(
             Text(
                 text = title,
                 style = RoomieTypography.titleLarge,
-                color = NavyPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
         },
         navigationIcon = {
@@ -58,7 +57,7 @@ fun RoomieTopBar(
                     Icon(
                         imageVector = Icons.Filled.Menu,
                         contentDescription = "Menu",
-                        tint = NavyPrimary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(Dimens.IconSizeMD)
                     )
                 }
@@ -85,7 +84,7 @@ fun RoomieTopBar(
             }
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = BackgroundLight
+            containerColor = MaterialTheme.colorScheme.surface
         )
     )
 }
