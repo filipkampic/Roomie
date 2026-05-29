@@ -51,7 +51,7 @@ fun RoomieTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = RoomieTypography,
         shapes = RoomieShapes,
         content = content
     )

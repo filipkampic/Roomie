@@ -1,9 +1,7 @@
 package com.roomie.app.core.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -11,11 +9,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import com.roomie.app.core.ui.theme.InputBackground
 import com.roomie.app.core.ui.theme.NavyPrimary
 import com.roomie.app.core.ui.theme.NavySecondary
+import com.roomie.app.core.ui.theme.RoomieShapes
+import com.roomie.app.core.ui.theme.RoomieTypography
 import com.roomie.app.core.ui.theme.TealPrimary
+
+@Preview(showBackground = false)
+@Composable
+fun RoomieTextFieldPreview() {
+    RoomieTextField(
+        value = "",
+        onValueChange = {},
+        placeholder = "Text...",
+        modifier = Modifier
+    )
+}
 
 @Composable
 fun RoomieTextField(
@@ -35,7 +46,7 @@ fun RoomieTextField(
         placeholder = {
             Text(
                 text = placeholder,
-                style = MaterialTheme.typography.bodyLarge,
+                style = RoomieTypography.bodyLarge,
                 color = NavySecondary
             )
         },
@@ -44,7 +55,7 @@ fun RoomieTextField(
         minLines = minLines,
         keyboardOptions = keyboardOptions,
         visualTransformation = visualTransformation,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoomieShapes.medium,
         colors = TextFieldDefaults.colors(
             focusedContainerColor = InputBackground,
             unfocusedContainerColor = InputBackground,
@@ -57,7 +68,7 @@ fun RoomieTextField(
             focusedPlaceholderColor = NavySecondary,
             unfocusedPlaceholderColor = NavySecondary
         ),
-        textStyle = MaterialTheme.typography.bodyLarge,
+        textStyle = RoomieTypography.bodyLarge,
         modifier = modifier.fillMaxWidth()
     )
 }

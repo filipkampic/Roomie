@@ -6,15 +6,23 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import com.roomie.app.R
+import com.roomie.app.core.ui.theme.Dimens
 import com.roomie.app.core.ui.theme.NavySecondary
+import com.roomie.app.core.ui.theme.RoomieTypography
+import com.roomie.app.core.ui.theme.TealPrimary
+
+@Preview(showBackground = false)
+@Composable
+fun RoomieLogoPreview() {
+    RoomieLogo()
+}
 
 @Composable
 fun RoomieLogo(modifier: Modifier = Modifier) {
@@ -25,21 +33,20 @@ fun RoomieLogo(modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(R.drawable.ic_roomie_logo),
             contentDescription = null,
-            modifier = Modifier.size(52.dp)
+            modifier = Modifier.size(Dimens.IconSizeXL - Dimens.SpaceXS)
         )
 
-
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(Dimens.SpaceMD - Dimens.SpaceXS))
 
         Column {
             Text(
                 text = "Roomie",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary
+                style = RoomieTypography.headlineLarge,
+                color = TealPrimary
             )
             Text(
                 text = "Smart Roommate\nManagement App",
-                style = MaterialTheme.typography.bodySmall,
+                style = RoomieTypography.bodySmall,
                 color = NavySecondary
             )
         }
