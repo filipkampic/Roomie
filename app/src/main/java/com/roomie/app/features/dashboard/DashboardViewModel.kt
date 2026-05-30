@@ -16,6 +16,13 @@ data class DashboardHeaderState(
     val isLoading: Boolean = true
 )
 
+data class DashboardSummaryState(
+    val pendingChores: Int = 0,
+    val totalExpenses: Double = 0.0,
+    val shoppingItems: Int = 0,
+    val overdueChores: Int = 0
+)
+
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val authRepository: AuthRepository,
@@ -24,6 +31,10 @@ class DashboardViewModel @Inject constructor(
 
     private val _headerState = MutableStateFlow(DashboardHeaderState())
     val headerState: StateFlow<DashboardHeaderState> = _headerState
+
+    private val _summaryState = MutableStateFlow(DashboardSummaryState())
+    val summaryState: StateFlow<DashboardSummaryState> = _summaryState
+
 
     init {
         loadHeaderData()
