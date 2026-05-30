@@ -2,6 +2,7 @@ package com.roomie.app.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.roomie.app.data.model.Household
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -28,7 +29,8 @@ class HouseholdRepository @Inject constructor(
             )
             docRef.set(household).await()
             usersCollection.document(uid)
-                .update("householdId", docRef.id).await()
+                .set(mapOf("housholdId" to docRef.id), SetOptions.merge())
+                .await()
             Result.success(household)
         } catch (e: Exception) {
             Result.failure(e)
@@ -47,7 +49,8 @@ class HouseholdRepository @Inject constructor(
             householdsCollection.document(doc.id)
                 .update("members", household.members + uid).await()
             usersCollection.document(uid)
-                .update("householdId", doc.id).await()
+                .set(mapOf("householdId" to doc.id), SetOptions.merge())
+                .await()
             Result.success(household.copy(members = household.members + uid))
         } catch (e: Exception) {
             Result.failure(e)

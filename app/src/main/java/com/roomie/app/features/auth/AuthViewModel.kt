@@ -1,6 +1,5 @@
 package com.roomie.app.features.auth
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -35,9 +34,10 @@ class AuthViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            val householdId = authRepository.fetchCurrentUserHouseholdId()
             val destination = when {
                 authRepository.currentUser == null -> Screen.Login.route
-                authRepository.fetchCurrentUserHouseholdId() != null -> Screen.Dashboard.route
+                householdId != null -> Screen.Dashboard.route
                 else -> Screen.HouseholdSetup.route
             }
             _startDestination.value = destination
@@ -60,7 +60,10 @@ class AuthViewModel @Inject constructor(
                 .onSuccess { user ->
                     authRepository.saveUser(user.uid, name, email)
                         .onSuccess { _uiState.value = AuthUiState.Success(user) }
-                        .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "Failed to save user") }
+                        .onFailure {
+                            authRepository.deleteCurrentUser()
+                            _uiState.value = AuthUiState.Error(it.message ?: "Failed to save user")
+                        }
                 }
                 .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "Registration failed") }
         }

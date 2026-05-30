@@ -1,5 +1,7 @@
 package com.roomie.app.features.dashboard
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.roomie.app.core.navigation.Screen
@@ -68,10 +70,15 @@ fun DashboardScreen(
                 .padding(horizontal = Dimens.ScreenPadding)
         ) {
             Spacer(modifier = Modifier.height(Dimens.SpaceLG))
-            DashboardHeader(
-                userName = headerState.userName,
-                householdName = headerState.householdName
-            )
+            AnimatedVisibility(
+                visible = !headerState.isLoading,
+                enter = fadeIn()
+            ) {
+                DashboardHeader(
+                    userName = headerState.userName,
+                    householdName = headerState.householdName
+                )
+            }
             Spacer(modifier = Modifier.height(Dimens.SpaceLG))
         }
     }

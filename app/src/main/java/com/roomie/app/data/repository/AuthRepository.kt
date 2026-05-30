@@ -66,4 +66,13 @@ class AuthRepository @Inject constructor(
             null
         }
     }
+
+    suspend fun deleteCurrentUser(): Result<Unit> {
+        return try {
+            auth.currentUser?.delete()?.await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
