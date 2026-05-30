@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.roomie.app.data.repository.AuthRepository
 import com.roomie.app.data.repository.HouseholdRepository
+import com.roomie.app.features.dashboard.components.UpcomingChoreItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +36,8 @@ class DashboardViewModel @Inject constructor(
     private val _summaryState = MutableStateFlow(DashboardSummaryState())
     val summaryState: StateFlow<DashboardSummaryState> = _summaryState
 
+    private val _upcomingChores = MutableStateFlow<List<UpcomingChoreItem>>(emptyList())
+    val upcomingChores: StateFlow<List<UpcomingChoreItem>> = _upcomingChores
 
     init {
         loadHeaderData()
