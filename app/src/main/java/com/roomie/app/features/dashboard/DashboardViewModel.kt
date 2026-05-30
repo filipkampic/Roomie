@@ -2,8 +2,10 @@ package com.roomie.app.features.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.roomie.app.data.model.Expense
 import com.roomie.app.data.repository.AuthRepository
 import com.roomie.app.data.repository.HouseholdRepository
+import com.roomie.app.features.dashboard.components.RecentExpenseItem
 import com.roomie.app.features.dashboard.components.UpcomingChoreItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +40,10 @@ class DashboardViewModel @Inject constructor(
 
     private val _upcomingChores = MutableStateFlow<List<UpcomingChoreItem>>(emptyList())
     val upcomingChores: StateFlow<List<UpcomingChoreItem>> = _upcomingChores
+
+    private val _recentExpenses = MutableStateFlow<List<RecentExpenseItem>>(emptyList())
+    val recentExpenses: StateFlow<List<RecentExpenseItem>> = _recentExpenses
+
 
     init {
         loadHeaderData()

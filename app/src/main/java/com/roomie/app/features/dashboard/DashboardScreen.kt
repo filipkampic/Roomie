@@ -24,6 +24,7 @@ import com.roomie.app.core.ui.components.RoomieTopBar
 import com.roomie.app.core.ui.theme.Dimens
 import com.roomie.app.features.dashboard.components.DashboardHeader
 import com.roomie.app.features.dashboard.components.DashboardSummaryGrid
+import com.roomie.app.features.dashboard.components.RecentExpensesSection
 import com.roomie.app.features.dashboard.components.UpcomingChoresSection
 
 @Composable
@@ -37,6 +38,7 @@ fun DashboardScreen(
     val headerState by viewModel.headerState.collectAsState()
     val summaryState by viewModel.summaryState.collectAsState()
     val upcomingChores by viewModel.upcomingChores.collectAsState()
+    val recentExpenses by viewModel.recentExpenses.collectAsState()
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -85,6 +87,8 @@ fun DashboardScreen(
             DashboardSummaryGrid(summaryState = summaryState)
             Spacer(modifier = Modifier.height(Dimens.SpaceLG))
             UpcomingChoresSection(chores = upcomingChores)
+            Spacer(modifier = Modifier.height(Dimens.SpaceLG))
+            RecentExpensesSection(expenses = recentExpenses)
             Spacer(modifier = Modifier.height(Dimens.SpaceLG))
         }
     }
