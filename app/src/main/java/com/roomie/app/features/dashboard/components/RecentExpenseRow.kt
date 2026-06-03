@@ -29,10 +29,7 @@ import com.roomie.app.core.ui.theme.ExpenseRed
 import com.roomie.app.core.ui.theme.RoomieTypography
 import com.roomie.app.core.ui.theme.TealLight
 import com.roomie.app.core.ui.theme.TealPrimary
-
-enum class ExpenseCategory {
-    GROCERIES, BILLS, CLEANING, OTHER
-}
+import com.roomie.app.data.model.ExpenseCategory
 
 @Preview(showBackground = false)
 @Composable
