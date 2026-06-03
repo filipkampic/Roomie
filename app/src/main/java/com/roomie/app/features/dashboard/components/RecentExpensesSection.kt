@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import com.roomie.app.core.ui.theme.Dimens
 import com.roomie.app.core.ui.theme.RoomieTypography
+import com.roomie.app.data.model.ExpenseCategory
 import kotlin.collections.take
 
 data class RecentExpenseItem(
