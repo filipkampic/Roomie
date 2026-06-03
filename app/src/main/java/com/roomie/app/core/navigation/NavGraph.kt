@@ -29,17 +29,12 @@ import com.roomie.app.features.shopping.ShoppingScreen
 
 @Composable
 fun NavGraph(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    val authViewModel: AuthViewModel = hiltViewModel()
     val startDestination by authViewModel.startDestination.collectAsState()
 
-    if (startDestination == null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
-        return
-    }
+    if (startDestination == null) return
 
     NavHost(
         navController = navController,
