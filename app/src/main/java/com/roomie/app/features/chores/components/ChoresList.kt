@@ -44,7 +44,8 @@ fun ChoresList(
     chores: List<Chore>,
     members: List<Pair<String, String>>,
     onToggle: (Chore) -> Unit,
-    onDelete: (Chore) -> Unit
+    onDelete: (Chore) -> Unit,
+    onEdit: (Chore) -> Unit
 ) {
     if (members.isEmpty()) {
         Box(
@@ -72,25 +73,25 @@ fun ChoresList(
         if (todayChores.isNotEmpty()) {
             item { SectionHeader("Today's Tasks", MaterialTheme.colorScheme.onBackground) }
             items(todayChores, key = { it.id }) { chore ->
-                ChoreItem(chore, members, onToggle, onDelete)
+                ChoreItem(chore, members, onToggle, onDelete, onEdit)
             }
         }
         if (overdueChores.isNotEmpty()) {
             item { SectionHeader("Overdue", StatusOverdueText) }
             items(overdueChores, key = { it.id }) { chore ->
-                ChoreItem(chore, members, onToggle, onDelete)
+                ChoreItem(chore, members, onToggle, onDelete, onEdit)
             }
         }
         if (upcomingChores.isNotEmpty()) {
             item { SectionHeader("Upcoming", NavySecondary) }
             items(upcomingChores, key = { it.id }) { chore ->
-                ChoreItem(chore, members, onToggle, onDelete)
+                ChoreItem(chore, members, onToggle, onDelete, onEdit)
             }
         }
         if (completedChores.isNotEmpty()) {
             item { SectionHeader("Completed", StatusCompletedText) }
             items(completedChores, key = { it.id }) { chore ->
-                ChoreItem(chore, members, onToggle, onDelete)
+                ChoreItem(chore, members, onToggle, onDelete, onEdit)
             }
         }
     }

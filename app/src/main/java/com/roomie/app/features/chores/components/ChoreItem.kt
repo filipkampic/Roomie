@@ -1,6 +1,7 @@
 package com.roomie.app.features.chores.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,7 +52,8 @@ fun ChoreItem(
     chore: Chore,
     members: List<Pair<String, String>>,
     onToggle: (Chore) -> Unit,
-    onDelete: (Chore) -> Unit
+    onDelete: (Chore) -> Unit,
+    onEdit: (Chore) -> Unit
 ) {
     val showDeleteDialog = remember { mutableStateOf(false) }
 
@@ -72,7 +74,7 @@ fun ChoreItem(
             SwipeDeleteBackground()
         }
     ) {
-        ChoreItemContent(chore, members, onToggle)
+        ChoreItemContent(chore, members, onToggle, onEdit)
     }
 
     if (showDeleteDialog.value) {
@@ -113,13 +115,18 @@ private fun SwipeDeleteBackground() {
 private fun ChoreItemContent (
     chore: Chore,
     members: List<Pair<String, String>>,
-    onToggle: (Chore) -> Unit
+    onToggle: (Chore) -> Unit,
+    onEdit: (Chore) -> Unit
 ) {
     val status = chore.resolveStatus()
     val assignedName = members.find { it.first == chore.assignedTo }?.second ?: chore.assignedTo
     val deadlineText = formatDeadline(chore.deadline)
 
-    RoomieCard(modifier = Modifier.fillMaxWidth()) {
+    RoomieCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onEdit(chore) }
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

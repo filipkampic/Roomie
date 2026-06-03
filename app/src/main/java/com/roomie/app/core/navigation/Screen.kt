@@ -13,7 +13,7 @@ sealed class Screen(val route: String) {
     // Main app
     object Dashboard : Screen("dashboard")
     object Chores : Screen("chores")
-    object AddChore : Screen("add_chore")
+    object AddChore : Screen("add_chore") { fun editRoute(choreId: String) = "add_chore?choreId=$choreId" }
     object Expenses : Screen("expenses")
     object AddExpense : Screen("add_expense")
     object Shopping : Screen("shopping")

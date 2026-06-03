@@ -152,7 +152,8 @@ fun ChoresScreen(
                             chores = filtered,
                             members = members,
                             onToggle = { viewModel.toggleComplete((it)) },
-                            onDelete = { viewModel.deleteChore(it) }
+                            onDelete = { viewModel.deleteChore(it) },
+                            onEdit = { navController.navigate(Screen.AddChore.editRoute(it.id)) }
                         )
                     }
                 }

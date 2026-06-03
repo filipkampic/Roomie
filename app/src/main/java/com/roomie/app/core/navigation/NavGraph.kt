@@ -1,18 +1,14 @@
 package com.roomie.app.core.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.roomie.app.features.auth.AuthViewModel
 import com.roomie.app.features.auth.LoginScreen
 import com.roomie.app.features.auth.RegisterScreen
@@ -66,8 +62,15 @@ fun NavGraph(
         composable(Screen.Chores.route) {
             ChoresScreen(navController = navController)
         }
-        composable(Screen.AddChore.route) {
-            AddChoreScreen(navController = navController)
+        composable(
+            route = "add_chore?choreId={choreId}",
+            arguments = listOf(navArgument("choreId") {
+                nullable = true
+                defaultValue = null
+            })
+        ) { backStackEntry ->
+            val choreId = backStackEntry.arguments?.getString("choreId")
+            AddChoreScreen(navController = navController, choreId = choreId)
         }
         composable(Screen.Expenses.route) {
             ExpensesScreen(navController = navController)

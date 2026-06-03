@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.roomie.app.core.ui.components.RoomieButton
 import com.roomie.app.core.ui.components.RoomieCard
@@ -57,8 +58,11 @@ import java.util.Calendar
 @Composable
 fun AddChoreScreen(
     navController: NavHostController,
+    choreId: String? = null,
     viewModel: ChoreViewModel = hiltViewModel()
 ) {
+    val isEditMode = choreId != null
+    val editChore by viewModel.editChore.collectAsState()
     val members by viewModel.members.collectAsState()
     val actionState by viewModel.actionState.collectAsState()
 
@@ -75,8 +79,28 @@ fun AddChoreScreen(
     var selectedHour by remember { mutableIntStateOf(12) }
     var selectedMinute by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(members) {
-        if (assignedTo == null && members.isNotEmpty()) {
+    LaunchedEffect(choreId) {
+        if (choreId != null) viewModel.loadChore(choreId)
+    }
+
+    LaunchedEffect(editChore) {
+        val chore = editChore ?: return@LaunchedEffect
+        title = chore.title
+        notes = chore.notes
+        if (chore.deadline > 0L) {
+            deadlineMillis = chore.deadline
+            selectedDateMillis = chore.deadline
+            val cal = Calendar.getInstance().apply { timeInMillis = chore.deadline }
+            selectedHour = cal.get(Calendar.HOUR_OF_DAY)
+            selectedMinute = cal.get(Calendar.MINUTE)
+        }
+        assignedTo = members.find { it.first == chore.assignedTo }
+    }
+
+    LaunchedEffect(members, editChore) {
+        if (isEditMode && assignedTo == null && members.isNotEmpty()) {
+            assignedTo = members.find { it.first == editChore?.assignedTo } ?: members.first()
+        } else if (!isEditMode && assignedTo == null && members.isNotEmpty()) {
             assignedTo = members.first()
         }
     }
@@ -119,12 +143,12 @@ fun AddChoreScreen(
             Spacer(modifier = Modifier.height(Dimens.SpaceSM))
 
             Text(
-                text = "New Chore",
+                text = if (isEditMode) "Edit Chore" else "New Chore",
                 style = RoomieTypography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
-                text = "Create a shared household task",
+                text = if (isEditMode) "Update household task" else "Create a shared household task",
                 style = RoomieTypography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -188,18 +212,28 @@ fun AddChoreScreen(
             Spacer(modifier = Modifier.height(Dimens.SpaceLG))
 
             RoomieButton(
-                text = "Create Chore",
+                text = if (isEditMode) "Update Chore" else "Create Chore",
                 onClick = {
                     if (title.isBlank()) {
                         titleError = true
                         return@RoomieButton
                     }
-                    viewModel.addChore(
-                        title = title.trim(),
-                        assignedTo = assignedTo?.first ?: "",
-                        deadline = deadlineMillis ?: 0L,
-                        notes = notes.trim()
-                    )
+                    if (isEditMode) {
+                        viewModel.updateChore(
+                            choreId = choreId!!,
+                            title = title.trim(),
+                            assignedTo = assignedTo?.first ?: "",
+                            deadline = deadlineMillis ?: 0L,
+                            notes = notes.trim()
+                        )
+                    } else {
+                        viewModel.addChore(
+                            title = title.trim(),
+                            assignedTo = assignedTo?.first ?: "",
+                            deadline = deadlineMillis ?: 0L,
+                            notes = notes.trim()
+                        )
+                    }
                 },
                 isLoading = actionState is ChoreActionState.Loading,
                 modifier = Modifier.fillMaxWidth()

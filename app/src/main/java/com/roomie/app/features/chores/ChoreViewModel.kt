@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -47,6 +48,9 @@ class ChoreViewModel @Inject constructor(
 
     private val _members = MutableStateFlow<List<Pair<String, String>>>(emptyList())
     val members: StateFlow<List<Pair<String, String>>> = _members
+
+    private val _editChore = MutableStateFlow<Chore?>(null)
+    val editChore: StateFlow<Chore?> = _editChore
 
     init {
         viewModelScope.launch {
@@ -111,7 +115,7 @@ class ChoreViewModel @Inject constructor(
             )
             choreRepository.addChore(chore)
                 .onSuccess { _actionState.value = ChoreActionState.Success }
-                .onFailure { e -> _actionState.value = ChoreActionState.Error(e.message ?: "Failed to add chore") }
+                .onFailure { _actionState.value = ChoreActionState.Error(it.message ?: "Failed to update chore") }
         }
     }
 
@@ -131,5 +135,42 @@ class ChoreViewModel @Inject constructor(
 
     fun resetActionState() {
         _actionState.value = ChoreActionState.Idle
+    }
+
+    fun loadChore(choreId: String) {
+        viewModelScope.launch {
+            val hId = _householdId.first { it.isNotEmpty() }
+            val chore = choreRepository.getChoresFlow(hId)
+                .first { chores -> chores.any { it.id == choreId } }
+                .find { it.id == choreId }
+            _editChore.value = chore
+        }
+    }
+
+    fun updateChore(
+        choreId: String,
+        title: String,
+        assignedTo: String,
+        deadline: Long,
+        notes: String
+    ) {
+        val hId = _householdId.value.ifEmpty { return }
+
+        viewModelScope.launch {
+            _actionState.value = ChoreActionState.Loading
+            val chore = Chore(
+                id = choreId,
+                title = title,
+                assignedTo = assignedTo,
+                deadline = deadline,
+                completed = _editChore.value?.completed ?: false,
+                createdBy = _editChore.value?.createdBy ?: _currentUserId.value,
+                householdId = hId,
+                notes = notes
+            )
+            choreRepository.updateChore(chore)
+                .onSuccess { _actionState.value = ChoreActionState.Success }
+                .onFailure { e -> _actionState.value = ChoreActionState.Error(e.message ?: "Failed to update chore") }
+        }
     }
 }
