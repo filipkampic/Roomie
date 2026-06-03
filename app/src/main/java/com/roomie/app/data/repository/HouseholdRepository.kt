@@ -29,7 +29,7 @@ class HouseholdRepository @Inject constructor(
             )
             docRef.set(household).await()
             usersCollection.document(uid)
-                .set(mapOf("housholdId" to docRef.id), SetOptions.merge())
+                .set(mapOf("householdId" to docRef.id), SetOptions.merge())
                 .await()
             Result.success(household)
         } catch (e: Exception) {
