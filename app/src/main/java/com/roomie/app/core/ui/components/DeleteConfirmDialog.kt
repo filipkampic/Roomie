@@ -16,6 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,8 +28,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.roomie.app.core.ui.theme.DestructiveRed
 import com.roomie.app.core.ui.theme.DestructiveRedLight
 import com.roomie.app.core.ui.theme.Dimens
-import com.roomie.app.core.ui.theme.NavyPrimary
-import com.roomie.app.core.ui.theme.NavySecondary
 import com.roomie.app.core.ui.theme.RoomieShapes
 import com.roomie.app.core.ui.theme.RoomieTypography
 import com.roomie.app.core.ui.theme.SurfaceWhite
@@ -55,7 +54,7 @@ fun DeleteConfirmDialog(
     BasicAlertDialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoomieShapes.large,
-            color = SurfaceWhite,
+            color = MaterialTheme.colorScheme.surface,
             tonalElevation = Dimens.CardElevation
         ) {
             Column(
@@ -84,7 +83,7 @@ fun DeleteConfirmDialog(
                 Text(
                     text = title,
                     style = RoomieTypography.titleMedium,
-                    color = NavyPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(Dimens.SpaceSM))
@@ -92,7 +91,7 @@ fun DeleteConfirmDialog(
                 Text(
                     text = message,
                     style = RoomieTypography.bodyMedium,
-                    color = NavySecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
 
@@ -112,7 +111,7 @@ fun DeleteConfirmDialog(
                         Text(
                             text = "Cancel",
                             style = RoomieTypography.labelLarge,
-                            color = NavyPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
 

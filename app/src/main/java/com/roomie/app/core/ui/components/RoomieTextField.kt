@@ -34,15 +34,26 @@ fun RoomieTextField(
     onValueChange: (String) -> Unit,
     placeholder: String,
     modifier: Modifier = Modifier,
+    isError: Boolean = false,
+    readOnly: Boolean = false,
+    enabled: Boolean = true,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
+    minLines: Int = 1,
+    maxLines: Int = 1,
+    singleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    singleLine: Boolean = true,
-    minLines: Int = 1
 ) {
     TextField(
         value = value,
         onValueChange = onValueChange,
+        readOnly = readOnly,
+        enabled = enabled,
+        isError = isError,
+        singleLine = singleLine,
+        minLines = minLines,
+        maxLines = if (singleLine) 1 else maxLines,
         placeholder = {
             Text(
                 text = placeholder,
@@ -51,22 +62,24 @@ fun RoomieTextField(
             )
         },
         trailingIcon = trailingIcon,
-        singleLine = singleLine,
-        minLines = minLines,
         keyboardOptions = keyboardOptions,
         visualTransformation = visualTransformation,
         shape = RoomieShapes.medium,
         colors = TextFieldDefaults.colors(
             focusedContainerColor = InputBackground,
             unfocusedContainerColor = InputBackground,
+            disabledContainerColor = InputBackground,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
             focusedTextColor = NavyPrimary,
             unfocusedTextColor = NavyPrimary,
+            disabledTextColor = NavyPrimary,
             cursorColor = TealPrimary,
             focusedPlaceholderColor = NavySecondary,
-            unfocusedPlaceholderColor = NavySecondary
+            unfocusedPlaceholderColor = NavySecondary,
+            disabledPlaceholderColor = NavySecondary,
+            disabledTrailingIconColor = TealPrimary
         ),
         textStyle = RoomieTypography.bodyLarge,
         modifier = modifier.fillMaxWidth()

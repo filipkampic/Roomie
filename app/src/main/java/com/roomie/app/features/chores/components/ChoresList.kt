@@ -42,7 +42,7 @@ fun ChoresList(
     onToggle: (Chore) -> Unit,
     onDelete: (Chore) -> Unit
 ) {
-    val todayChores = chores.filter { !it.completed && it.resolveStatus() != ChoreStatus.OVERDUE && it.isToday() }
+    val todayChores = chores.filter { !it.completed && it.resolveStatus() != ChoreStatus.OVERDUE && (it.isToday() || it.deadline == 0L) }
     val overdueChores = chores.filter { it.resolveStatus() == ChoreStatus.OVERDUE }
     val upcomingChores = chores.filter { it.isUpcoming() }
     val completedChores = chores.filter { it.completed }

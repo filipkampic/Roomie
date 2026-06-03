@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +29,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.roomie.app.core.navigation.Screen
 import com.roomie.app.core.ui.components.ChoreStatus
-import com.roomie.app.core.ui.components.DeleteConfirmDialog
 import com.roomie.app.core.ui.components.RoomieBottomNavBar
 import com.roomie.app.core.ui.components.RoomieTopBar
 import com.roomie.app.core.ui.theme.Dimens
@@ -69,7 +67,6 @@ fun ChoresScreen(
     val currentRoute = navBackStackEntry?.destination?.route
 
     var activeFilter by remember { mutableStateOf(ChoreFilter.ALL) }
-    var choreToDelete by remember { mutableStateOf<Chore?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(actionState) {
@@ -155,23 +152,11 @@ fun ChoresScreen(
                             chores = filtered,
                             members = members,
                             onToggle = { viewModel.toggleComplete((it)) },
-                            onDelete = { choreToDelete = it }
+                            onDelete = { viewModel.deleteChore(it) }
                         )
                     }
                 }
             }
         }
-    }
-
-    choreToDelete?.let { chore ->
-        DeleteConfirmDialog(
-            title = "Delete chore?",
-            message = "This action cannot be undone. The chore will be permanently removed.",
-            onConfirm = {
-                viewModel.deleteChore(chore)
-                choreToDelete = null
-            },
-            onDismiss = { choreToDelete = null }
-        )
     }
 }
