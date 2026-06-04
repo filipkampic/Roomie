@@ -26,13 +26,25 @@ fun RoomieCardPreview() {
 fun RoomieCard(
     modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.surface,
+    onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Card(
-        modifier = modifier,
-        shape = RoomieShapes.large,
-        elevation = CardDefaults.cardElevation(defaultElevation = Dimens.CardElevation),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        content = content
-    )
+    if (onClick != null) {
+        Card(
+            modifier = modifier,
+            shape = RoomieShapes.large,
+            elevation = CardDefaults.cardElevation(defaultElevation = Dimens.CardElevation),
+            colors = CardDefaults.cardColors(containerColor = containerColor),
+            onClick = onClick,
+            content = content
+        )
+    } else {
+        Card(
+            modifier = modifier,
+            shape = RoomieShapes.large,
+            elevation = CardDefaults.cardElevation(defaultElevation = Dimens.CardElevation),
+            colors = CardDefaults.cardColors(containerColor = containerColor),
+            content = content
+        )
+    }
 }

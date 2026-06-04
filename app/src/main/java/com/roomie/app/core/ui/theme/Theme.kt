@@ -50,7 +50,7 @@ fun RoomieTheme(
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = LightColorScheme,
         typography = RoomieTypography,
         shapes = RoomieShapes,
         content = content
