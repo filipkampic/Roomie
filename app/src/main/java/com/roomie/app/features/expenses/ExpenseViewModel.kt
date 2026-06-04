@@ -112,6 +112,7 @@ class ExpenseViewModel @Inject constructor(
             val expense = Expense(
                 title = title,
                 amount = amount,
+                createdBy = uid,
                 paidBy = paidBy,
                 splitBetween = splitBetween,
                 settledBy = if (uid in splitBetween) listOf(uid) else emptyList(),

@@ -41,7 +41,7 @@ fun HouseholdBalanceCard(
     ) {
         Column {
             Text(
-                text = "Household Balance",
+                text = "Total Household Expenses",
                 style = RoomieTypography.bodyMedium,
                 color = SurfaceWhite.copy(alpha = 0.8f)
             )

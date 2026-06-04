@@ -4,6 +4,7 @@ data class Expense(
     val id: String = "",
     val title: String = "",
     val amount: Double = 0.0,
+    val createdBy: String = "",
     val paidBy: String = "",
     val splitBetween: List<String> = emptyList(),
     val settledBy: List<String> = emptyList(),
