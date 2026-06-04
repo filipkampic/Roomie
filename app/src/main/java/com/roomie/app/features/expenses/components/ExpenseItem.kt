@@ -5,33 +5,40 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.Receipt
 import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import com.roomie.app.core.ui.components.DeleteConfirmDialog
 import com.roomie.app.core.ui.components.RoomieCard
+import com.roomie.app.core.ui.theme.DestructiveRed
 import com.roomie.app.core.ui.theme.Dimens
 import com.roomie.app.core.ui.theme.ExpenseRed
+import com.roomie.app.core.ui.theme.RoomieShapes
 import com.roomie.app.core.ui.theme.RoomieTypography
+import com.roomie.app.core.ui.theme.SurfaceWhite
 import com.roomie.app.core.ui.theme.TealLight
 import com.roomie.app.core.ui.theme.TealPrimary
 import com.roomie.app.data.model.Expense
@@ -46,63 +53,92 @@ fun ExpenseItem(
     onDelete: (Expense) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    val showDeleteDialog = remember { mutableStateOf(false) }
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { value ->
+            if (value == SwipeToDismissBoxValue.EndToStart && !showDeleteDialog.value) {
+                showDeleteDialog.value = true
+            }
+            false
+        },
+        positionalThreshold = { it * 0.4f }
+    )
 
-    if (showDeleteDialog) {
+    SwipeToDismissBox(
+        state = dismissState,
+        modifier = modifier,
+        enableDismissFromStartToEnd = false,
+        backgroundContent = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 2.dp)
+                    .clip(RoomieShapes.large)
+                    .background(DestructiveRed),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete",
+                    tint = SurfaceWhite,
+                    modifier = Modifier.padding(end = Dimens.SpaceLG)
+                )
+            }
+        }
+    ) {
+        RoomieCard(modifier = modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimens.CardPadding),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(Dimens.IconSizeLG)
+                        .clip(CircleShape)
+                        .background(TealLight),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = expense.expenseCategory().toIcon(),
+                        contentDescription = null,
+                        tint = TealPrimary,
+                        modifier = Modifier.size(Dimens.IconSizeMD)
+                    )
+                }
+                Spacer(modifier = Modifier.width(Dimens.SpaceMD))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = expense.title,
+                        style = RoomieTypography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = formatExpenseDate(expense.date),
+                        style = RoomieTypography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Text(
+                    text = "-${"%.2f".format(expense.amount)} €",
+                    style = RoomieTypography.titleSmall,
+                    color = ExpenseRed
+                )
+            }
+        }
+    }
+
+    if (showDeleteDialog.value) {
         DeleteConfirmDialog(
             title = "Delete expense?",
             message = "This action cannot be undone. The expense will be permanently removed.",
             onConfirm = {
-                showDeleteDialog = false
+                showDeleteDialog.value = false
                 onDelete(expense)
             },
-            onDismiss = { showDeleteDialog = false }
+            onDismiss = { showDeleteDialog.value = false }
         )
-    }
-
-    RoomieCard(
-        modifier = modifier.fillMaxWidth(),
-        onClick = { showDeleteDialog = true }
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(Dimens.CardPadding),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(Dimens.IconSizeLG)
-                    .clip(CircleShape)
-                    .background(TealLight),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = expense.expenseCategory().toIcon(),
-                    contentDescription = null,
-                    tint = TealPrimary,
-                    modifier = Modifier.size(Dimens.IconSizeMD)
-                )
-            }
-            Spacer(modifier = Modifier.width(Dimens.SpaceMD))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = expense.title,
-                    style = RoomieTypography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = formatExpenseDate(expense.date),
-                    style = RoomieTypography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Text(
-                text = "-${"%.2f".format(expense.amount)} €",
-                style = RoomieTypography.titleSmall,
-                color = ExpenseRed
-            )
-        }
     }
 }
 

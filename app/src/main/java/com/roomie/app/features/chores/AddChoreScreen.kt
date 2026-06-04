@@ -50,7 +50,7 @@ import com.roomie.app.core.ui.theme.SurfaceWhite
 import com.roomie.app.core.ui.theme.TealPrimary
 import com.roomie.app.features.chores.components.AssignToDropdown
 import com.roomie.app.features.chores.components.DeadlineField
-import com.roomie.app.features.chores.components.FieldLabel
+import com.roomie.app.core.ui.components.FieldLabel
 import com.roomie.app.features.chores.components.TimePickerDialog
 import java.util.Calendar
 
