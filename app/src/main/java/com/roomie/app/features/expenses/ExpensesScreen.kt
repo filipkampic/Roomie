@@ -167,8 +167,17 @@ fun ExpensesScreen(
                         }
                     } else {
                         items(state.expenses, key = { it.id }) { expense ->
+                            val members = viewModel.members.collectAsState().value
+                            val paidByName = members.find { it.first == expense.paidBy }?.second ?: expense.paidBy
+                            val splitCount = expense.splitBetween.size
+                            val userShare = if (currentUserId in expense.splitBetween && splitCount > 0)
+                                expense.amount / splitCount else 0.0
+
                             ExpenseItem(
                                 expense = expense,
+                                paidByName = paidByName,
+                                userShare = userShare,
+                                currentUserId = currentUserId,
                                 onDelete = { viewModel.deleteExpense(it) }
                             )
                         }

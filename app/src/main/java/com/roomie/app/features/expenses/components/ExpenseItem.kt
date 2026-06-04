@@ -38,6 +38,7 @@ import com.roomie.app.core.ui.theme.Dimens
 import com.roomie.app.core.ui.theme.ExpenseRed
 import com.roomie.app.core.ui.theme.RoomieShapes
 import com.roomie.app.core.ui.theme.RoomieTypography
+import com.roomie.app.core.ui.theme.StatusCompletedText
 import com.roomie.app.core.ui.theme.SurfaceWhite
 import com.roomie.app.core.ui.theme.TealLight
 import com.roomie.app.core.ui.theme.TealPrimary
@@ -50,6 +51,9 @@ import java.util.Locale
 @Composable
 fun ExpenseItem(
     expense: Expense,
+    paidByName: String,
+    userShare: Double,
+    currentUserId: String,
     onDelete: (Expense) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -119,12 +123,28 @@ fun ExpenseItem(
                         style = RoomieTypography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+
+                    Text(
+                        text = "Paid by $paidByName",
+                        style = RoomieTypography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-                Text(
-                    text = "-${"%.2f".format(expense.amount)} €",
-                    style = RoomieTypography.titleSmall,
-                    color = ExpenseRed
-                )
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = "-${"%.2f".format(expense.amount)} €",
+                        style = RoomieTypography.titleSmall,
+                        color = ExpenseRed
+                    )
+                    if (userShare > 0) {
+                        val isPayerSelf = expense.paidBy == currentUserId
+                        Text(
+                            text = if (isPayerSelf) "You paid" else "You owe €${"%.2f".format(userShare)}",
+                            style = RoomieTypography.bodySmall,
+                            color = if (isPayerSelf) StatusCompletedText else ExpenseRed
+                        )
+                    }
+                }
             }
         }
     }
