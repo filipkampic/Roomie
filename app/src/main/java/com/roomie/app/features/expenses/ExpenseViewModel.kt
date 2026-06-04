@@ -106,6 +106,7 @@ class ExpenseViewModel @Inject constructor(
         category: String
     ) {
         val hId = _householdId.value.ifEmpty { return }
+        val uid = _currentUserId.value
         viewModelScope.launch {
             _actionState.value = ExpenseActionState.Loading
             val expense = Expense(
@@ -113,6 +114,7 @@ class ExpenseViewModel @Inject constructor(
                 amount = amount,
                 paidBy = paidBy,
                 splitBetween = splitBetween,
+                settledBy = if (uid in splitBetween) listOf(uid) else emptyList(),
                 date = System.currentTimeMillis(),
                 householdId = hId,
                 category = category
@@ -132,5 +134,13 @@ class ExpenseViewModel @Inject constructor(
 
     fun resetActionState() {
         _actionState.value = ExpenseActionState.Idle
+    }
+
+    fun settleExpense(expense: Expense) {
+        val uid = _currentUserId.value.ifEmpty { return }
+        viewModelScope.launch {
+            expenseRepository.settleExpense(expense.householdId, expense.id, uid)
+                .onFailure { _actionState.value = ExpenseActionState.Error(it.message ?: "Failed to settle expense") }
+        }
     }
 }

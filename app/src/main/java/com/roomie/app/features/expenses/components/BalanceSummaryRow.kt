@@ -70,7 +70,7 @@ private fun BalanceCard(
                 )
                 Spacer(modifier = Modifier.width(Dimens.SpaceXS))
                 Text(
-                    text = "€${"%.0f".format(amount)}",
+                    text = "€${"%.2f".format(amount)}",
                     style = RoomieTypography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface

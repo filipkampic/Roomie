@@ -178,7 +178,8 @@ fun ExpensesScreen(
                                 paidByName = paidByName,
                                 userShare = userShare,
                                 currentUserId = currentUserId,
-                                onDelete = { viewModel.deleteExpense(it) }
+                                onDelete = { viewModel.deleteExpense(it) },
+                                onSettle = { viewModel.settleExpense(it) }
                             )
                         }
                     }

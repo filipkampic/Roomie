@@ -16,10 +16,14 @@ fun calculateBalances(
         val sharePerPerson = expense.amount / splitCount
 
         for (uid in expense.splitBetween) {
-            balances[uid] = (balances[uid] ?: 0.0) - sharePerPerson
+            if (uid !in expense.settledBy) {
+                balances[uid] = (balances[uid] ?: 0.0) - sharePerPerson
+            }
         }
 
-        balances[expense.paidBy] = (balances[expense.paidBy] ?: 0.0) + expense.amount
+        val unsettledCount = expense.splitBetween.count { it !in expense.settledBy }
+        val creditedAmount = sharePerPerson * unsettledCount
+        balances[expense.paidBy] = (balances[expense.paidBy] ?: 0.0) + creditedAmount
     }
 
     return balances

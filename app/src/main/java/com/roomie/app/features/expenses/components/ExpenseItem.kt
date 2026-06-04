@@ -1,6 +1,7 @@
 package com.roomie.app.features.expenses.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.MoreHoriz
@@ -28,8 +30,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.roomie.app.core.ui.components.DeleteConfirmDialog
 import com.roomie.app.core.ui.components.RoomieCard
@@ -38,6 +42,7 @@ import com.roomie.app.core.ui.theme.Dimens
 import com.roomie.app.core.ui.theme.ExpenseRed
 import com.roomie.app.core.ui.theme.RoomieShapes
 import com.roomie.app.core.ui.theme.RoomieTypography
+import com.roomie.app.core.ui.theme.StatusCompletedBg
 import com.roomie.app.core.ui.theme.StatusCompletedText
 import com.roomie.app.core.ui.theme.SurfaceWhite
 import com.roomie.app.core.ui.theme.TealLight
@@ -55,15 +60,28 @@ fun ExpenseItem(
     userShare: Double,
     currentUserId: String,
     onDelete: (Expense) -> Unit,
+    onSettle: (Expense) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val showDeleteDialog = remember { mutableStateOf(false) }
+
+    val isSettledByMe = expense.isSettledBy(currentUserId)
+    val isFullySettled = expense.isFullySettled()
+    val isPayer = expense.paidBy == currentUserId
+
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
-            if (value == SwipeToDismissBoxValue.EndToStart && !showDeleteDialog.value) {
-                showDeleteDialog.value = true
+            when (value) {
+                SwipeToDismissBoxValue.EndToStart -> {
+                    if (!showDeleteDialog.value) showDeleteDialog.value = true
+                    false
+                }
+                SwipeToDismissBoxValue.StartToEnd -> {
+                    if (!isSettledByMe && !isPayer) onSettle(expense)
+                    false
+                }
+                else -> false
             }
-            false
         },
         positionalThreshold = { it * 0.4f }
     )
@@ -71,43 +89,78 @@ fun ExpenseItem(
     SwipeToDismissBox(
         state = dismissState,
         modifier = modifier,
-        enableDismissFromStartToEnd = false,
+        enableDismissFromStartToEnd = !isSettledByMe && !isPayer,
         backgroundContent = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(vertical = 2.dp)
-                    .clip(RoomieShapes.large)
-                    .background(DestructiveRed),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = SurfaceWhite,
-                    modifier = Modifier.padding(end = Dimens.SpaceLG)
-                )
+            val direction = dismissState.dismissDirection
+            if (direction == SwipeToDismissBoxValue.StartToEnd) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(vertical = 2.dp)
+                        .clip(RoomieShapes.large)
+                        .background(StatusCompletedText),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = "Settle",
+                        tint = SurfaceWhite,
+                        modifier = Modifier.padding(start = Dimens.SpaceLG)
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(vertical = 2.dp)
+                        .clip(RoomieShapes.large)
+                        .background(DestructiveRed),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = SurfaceWhite,
+                        modifier = Modifier.padding(end = Dimens.SpaceLG)
+                    )
+                }
             }
         }
     ) {
-        RoomieCard(modifier = modifier.fillMaxWidth()) {
+        val borderColor = when {
+            isFullySettled -> StatusCompletedText
+            isSettledByMe -> StatusCompletedText.copy(alpha = 0.5f)
+            else -> null
+        }
+
+        RoomieCard(
+            modifier = modifier
+                .fillMaxWidth()
+                .then(
+                    if (borderColor != null)
+                                Modifier.border(1.dp, borderColor, RoomieShapes.large)
+                        else Modifier
+                )
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(Dimens.CardPadding),
+                    .padding(Dimens.CardPadding)
+                    .alpha(if (isFullySettled) 0.6f else 1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
                         .size(Dimens.IconSizeLG)
                         .clip(CircleShape)
-                        .background(TealLight),
+                        .background(if (isFullySettled) StatusCompletedBg else TealLight),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = expense.expenseCategory().toIcon(),
+                        imageVector = if (isFullySettled) Icons.Default.CheckCircle
+                                      else expense.expenseCategory().toIcon(),
                         contentDescription = null,
-                        tint = TealPrimary,
+                        tint = if (isFullySettled) StatusCompletedText else TealPrimary,
                         modifier = Modifier.size(Dimens.IconSizeMD)
                     )
                 }
@@ -116,7 +169,9 @@ fun ExpenseItem(
                     Text(
                         text = expense.title,
                         style = RoomieTypography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textDecoration = if (isFullySettled) TextDecoration.LineThrough
+                                         else TextDecoration.None
                     )
                     Text(
                         text = formatExpenseDate(expense.date),
@@ -129,19 +184,36 @@ fun ExpenseItem(
                         style = RoomieTypography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    when {
+                        isFullySettled -> Text(
+                            text = "Fully settled",
+                            style = RoomieTypography.bodySmall,
+                            color = StatusCompletedText
+                        )
+                        isSettledByMe -> Text(
+                            text = "Your share settled",
+                            style = RoomieTypography.bodySmall,
+                            color = StatusCompletedText
+                        )
+                    }
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = "-${"%.2f".format(expense.amount)} €",
                         style = RoomieTypography.titleSmall,
-                        color = ExpenseRed
+                        color = if (isFullySettled) MaterialTheme.colorScheme.onSurfaceVariant
+                                else ExpenseRed
                     )
-                    if (userShare > 0) {
-                        val isPayerSelf = expense.paidBy == currentUserId
-                        Text(
-                            text = if (isPayerSelf) "You paid" else "You owe €${"%.2f".format(userShare)}",
+                    when {
+                        !isSettledByMe && !isPayer && userShare > 0 -> Text(
+                            text = "You owe €${"%.2f".format(userShare)}",
                             style = RoomieTypography.bodySmall,
-                            color = if (isPayerSelf) StatusCompletedText else ExpenseRed
+                            color = ExpenseRed
+                        )
+                        isPayer && !isFullySettled -> Text(
+                            text = "You paid",
+                            style = RoomieTypography.bodySmall,
+                            color = StatusCompletedText
                         )
                     }
                 }

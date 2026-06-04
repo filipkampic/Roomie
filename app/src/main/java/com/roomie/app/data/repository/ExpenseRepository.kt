@@ -1,5 +1,6 @@
 package com.roomie.app.data.repository
 
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.roomie.app.data.model.Expense
@@ -49,6 +50,22 @@ class ExpenseRepository @Inject constructor(
     suspend fun deleteExpense(householdId: String, expenseId: String): Result<Unit> {
         return try {
             expensesCollection(householdId).document(expenseId).delete().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun settleExpense(
+        householdId: String,
+        expenseId: String,
+        userId: String
+    ): Result<Unit> {
+        return try {
+            expensesCollection(householdId)
+                .document(expenseId)
+                .update("settledBy", FieldValue.arrayUnion(userId))
+                .await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

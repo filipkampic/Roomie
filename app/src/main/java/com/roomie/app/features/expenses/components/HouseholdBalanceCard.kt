@@ -27,7 +27,7 @@ fun HouseholdBalanceCard(
 ) {
     val gradient = Brush.horizontalGradient(listOf(TealPrimary, TealDark))
     val oweText = when {
-        userBalance < 0 -> $$"You owe €${\"%.2f\".format(-userBalance)}"
+        userBalance < 0 -> "You owe €${"%.2f".format(-userBalance)}"
         userBalance > 0 -> "You are owed €${"%.2f".format(userBalance)}"
         else -> "All settled up"
     }
