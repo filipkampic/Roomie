@@ -68,7 +68,7 @@ fun ExpenseItem(
     val isSettledByMe = expense.isSettledBy(currentUserId)
     val isFullySettled = expense.isFullySettled()
     val isPayer = expense.paidBy == currentUserId
-    val canDelete = currentUserId == expense.createdBy
+    val canDelete = currentUserId == expense.createdBy || expense.createdBy.isEmpty()
 
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
