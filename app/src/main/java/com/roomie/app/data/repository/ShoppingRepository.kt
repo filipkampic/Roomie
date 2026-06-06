@@ -65,4 +65,16 @@ class ShoppingRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    suspend fun updateItem(item: ShoppingItem): Result<Unit> {
+        return try {
+            itemsCollection(item.householdId)
+                .document(item.id)
+                .set(item)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

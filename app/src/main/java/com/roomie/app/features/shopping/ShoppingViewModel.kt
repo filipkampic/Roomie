@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -48,6 +49,9 @@ class ShoppingViewModel @Inject constructor(
 
     private val _members = MutableStateFlow<List<Pair<String, String>>>(emptyList())
     val members: StateFlow<List<Pair<String, String>>> = _members
+
+    private val _editItem = MutableStateFlow<ShoppingItem?>(null)
+    val editItem: StateFlow<ShoppingItem?> = _editItem
 
     init {
         viewModelScope.launch {
@@ -136,6 +140,42 @@ class ShoppingViewModel @Inject constructor(
         viewModelScope.launch {
             shoppingRepository.deleteItem(item.householdId, item.id)
                 .onFailure { _actionState.value = ShoppingActionState.Error(it.message ?: "Failed to delete item") }
+        }
+    }
+
+    fun loadItem(itemId: String) {
+        viewModelScope.launch {
+            val hId = _householdId.first { it.isNotEmpty() }
+            val item = shoppingRepository.getItemsFlow(hId)
+                .first { items -> items.any { it.id == itemId } }
+                .find { it.id == itemId }
+            _editItem.value = item
+        }
+    }
+
+    fun updateItem(
+        itemId: String,
+        name: String,
+        quantity: Int,
+        category: String,
+        notes: String
+    ) {
+        val hId = _householdId.value.ifEmpty { return }
+        viewModelScope.launch {
+            _actionState.value = ShoppingActionState.Loading
+            val item = ShoppingItem(
+                id = itemId,
+                name = name.trim(),
+                quantity = quantity,
+                category = category,
+                notes = notes,
+                completed = _editItem.value?.completed ?: false,
+                addedBy = _editItem.value?.addedBy ?: _currentUserId.value,
+                householdId = hId
+            )
+            shoppingRepository.updateItem(item)
+                .onSuccess { _actionState.value = ShoppingActionState.Success }
+                .onFailure { _actionState.value = ShoppingActionState.Error(it.message ?: "Failed to update item") }
         }
     }
 

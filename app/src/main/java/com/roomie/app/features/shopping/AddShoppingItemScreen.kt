@@ -50,10 +50,14 @@ import com.roomie.app.features.shopping.components.QuantityStepper
 @Composable
 fun AddShoppingItemScreen(
     navController: NavHostController,
+    itemId: String? = null,
     viewModel: ShoppingViewModel = hiltViewModel()
 ) {
     val actionState by viewModel.actionState.collectAsState()
     val members by viewModel.members.collectAsState()
+
+    val isEditMode = itemId != null
+    val editItem by viewModel.editItem.collectAsState()
 
     var name by remember { mutableStateOf("") }
     var quantity by remember { mutableIntStateOf(1) }
@@ -65,6 +69,21 @@ fun AddShoppingItemScreen(
         if (actionState is ShoppingActionState.Success) {
             viewModel.resetActionState()
             navController.popBackStack()
+        }
+    }
+
+    LaunchedEffect(itemId) {
+        if (itemId != null) viewModel.loadItem(itemId)
+    }
+
+    LaunchedEffect(editItem) {
+        editItem?.let { item ->
+            if (isEditMode) {
+                name = item.name
+                quantity = item.quantity
+                selectedCategory = item.shoppingCategory()
+                notes = item.notes
+            }
         }
     }
 
@@ -108,12 +127,12 @@ fun AddShoppingItemScreen(
             Spacer(Modifier.height(Dimens.SpaceSM))
 
             Text(
-                text = "Add Shopping Item",
+                text = if (isEditMode) "Edit Item" else "Add Shopping Item",
                 style = RoomieTypography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
-                text = "Add a new item to the shared shopping list",
+                text = if (isEditMode) "Update shopping list item" else "Add a new item to the shared shopping list",
                 style = RoomieTypography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -177,16 +196,15 @@ fun AddShoppingItemScreen(
             Spacer(Modifier.height(Dimens.SpaceLG))
 
             RoomieButton(
-                text = "Add Item",
+                text = if (isEditMode) "Update Item" else "Add Item",
                 onClick = {
                     nameError = name.isBlank()
                     if (!nameError) {
-                        viewModel.addItem(
-                            name = name.trim(),
-                            quantity = quantity,
-                            category = selectedCategory.name,
-                            notes = notes.trim()
-                        )
+                        if (isEditMode) {
+                            viewModel.updateItem(itemId, name.trim(), quantity, selectedCategory.name, notes.trim())
+                        } else {
+                            viewModel.addItem(name.trim(), quantity, selectedCategory.name, notes.trim())
+                        }
                     }
                 },
                 isLoading = isLoading,

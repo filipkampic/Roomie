@@ -82,8 +82,15 @@ fun NavGraph(
         composable(Screen.Shopping.route) {
             ShoppingScreen(navController = navController)
         }
-        composable(Screen.AddShopping.route) {
-            AddShoppingItemScreen(navController = navController)
+        composable(
+            route = "add_shopping?itemId={itemId}",
+            arguments = listOf(navArgument("itemId") {
+                nullable = true
+                defaultValue = null
+            })
+        ) { backStackEntry ->
+            val itemId = backStackEntry.arguments?.getString("itemId")
+            AddShoppingItemScreen(navController = navController, itemId = itemId)
         }
         composable(Screen.Profile.route) {
             ProfileScreen(navController = navController)

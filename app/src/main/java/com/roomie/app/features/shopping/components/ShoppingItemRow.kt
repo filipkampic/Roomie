@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
@@ -36,9 +36,7 @@ import com.roomie.app.core.ui.theme.Dimens
 import com.roomie.app.core.ui.theme.DestructiveRed
 import com.roomie.app.core.ui.theme.DestructiveRedLight
 import com.roomie.app.core.ui.theme.RoomieShapes
-import com.roomie.app.core.ui.theme.StatusCompletedBg
 import com.roomie.app.core.ui.theme.StatusCompletedText
-import com.roomie.app.core.ui.theme.TealPrimary
 import com.roomie.app.data.model.ShoppingItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +45,7 @@ fun ShoppingItemRow(
     item: ShoppingItem,
     addedByName: String,
     onToggle: () -> Unit,
+    onEdit: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -109,35 +108,23 @@ fun ShoppingItemRow(
             shape = RoomieShapes.large,
             color = MaterialTheme.colorScheme.surface,
             shadowElevation = 1.dp,
-            onClick = onToggle
+            onClick = onEdit
         ) {
             Row(
                 modifier = Modifier.padding(Dimens.CardPadding),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Surface(
-                    shape = RoomieShapes.medium,
-                    color = if (item.completed) StatusCompletedBg
-                    else MaterialTheme.colorScheme.surfaceVariant,
-                    modifier = Modifier.size(40.dp)
+                IconButton(
+                    onClick = onToggle,
+                    modifier = Modifier.size(48.dp)
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        if (item.completed) {
-                            Icon(
-                                imageVector = Icons.Default.CheckCircle,
-                                contentDescription = "Purchased",
-                                tint = StatusCompletedText,
-                                modifier = Modifier.size(22.dp)
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.ShoppingCart,
-                                contentDescription = "To buy",
-                                tint = TealPrimary,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = "Toggle purchased",
+                        tint = if (item.completed) StatusCompletedText
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
 
                 Spacer(Modifier.width(Dimens.SpaceMD))
@@ -157,6 +144,14 @@ fun ShoppingItemRow(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+
+                    if (item.notes.isNotEmpty()) {
+                        Text(
+                            text = item.notes,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        )
+                    }
                 }
 
                 Spacer(Modifier.width(Dimens.SpaceSM))

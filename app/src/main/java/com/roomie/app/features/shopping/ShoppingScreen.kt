@@ -1,6 +1,5 @@
 package com.roomie.app.features.shopping
 
-import android.net.http.SslCertificate.saveState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -181,6 +180,7 @@ fun ShoppingScreen(
                                     addedByName = members.find { it.first == item.addedBy }?.second
                                         ?: "Unknown",
                                     onToggle = { viewModel.toggleCompleted(item) },
+                                    onEdit = { navController.navigate(Screen.AddShopping.editRoute(item.id)) },
                                     onDelete = { viewModel.deleteItem(item) }
                                 )
                             }
@@ -206,6 +206,7 @@ fun ShoppingScreen(
                                     addedByName = members.find { it.first == item.addedBy }?.second
                                         ?: "Unknown",
                                     onToggle = { viewModel.toggleCompleted(item) },
+                                    onEdit = { navController.navigate(Screen.AddShopping.editRoute(item.id)) },
                                     onDelete = { viewModel.deleteItem(item) }
                                 )
                             }
