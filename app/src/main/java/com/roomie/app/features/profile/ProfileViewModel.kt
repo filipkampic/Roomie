@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.roomie.app.data.repository.AuthRepository
 import com.roomie.app.data.repository.ChoreRepository
 import com.roomie.app.data.repository.ExpenseRepository
+import com.roomie.app.data.repository.HouseholdRepository
 import com.roomie.app.data.repository.ShoppingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,12 +21,16 @@ data class ProfileUiState(
     val tasksDone: Int = 0,
     val totalPaid: Double = 0.0,
     val shoppingItemsAdded: Int = 0,
+    val householdName: String = "",
+    val inviteCode: String = "",
+    val members: List<Pair<String, String>> = emptyList(),
     val isLoading: Boolean = true
 )
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val householdRepository: HouseholdRepository,
     private val choreRepository: ChoreRepository,
     private val expenseRepository: ExpenseRepository,
     private val shoppingRepository: ShoppingRepository
@@ -44,6 +49,13 @@ class ProfileViewModel @Inject constructor(
                 val user = authRepository.fetchCurrentUser() ?: return@launch
                 val hId = user.householdId.ifEmpty { return@launch }
                 val uid = user.id
+                val household = householdRepository.fetchHousehold(hId).getOrNull()
+                val householdName = household?.name ?: ""
+                val inviteCode = household?.inviteCode ?: ""
+                val members = household?.members?.mapNotNull { memberUid ->
+                    val name = authRepository.fetchUserName(memberUid)
+                    if (name != null) memberUid to name else null
+                } ?: emptyList()
 
                 combine(
                     choreRepository.getChoresFlow(hId),
@@ -62,6 +74,9 @@ class ProfileViewModel @Inject constructor(
                         tasksDone = tasksDone,
                         totalPaid = totalPaid,
                         shoppingItemsAdded = shoppingAdded,
+                        householdName = householdName,
+                        inviteCode = inviteCode,
+                        members = members,
                         isLoading = false
                     )
                 }

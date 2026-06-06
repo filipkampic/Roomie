@@ -20,12 +20,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +46,7 @@ import com.roomie.app.core.ui.theme.DestructiveRedLight
 import com.roomie.app.core.ui.theme.Dimens
 import com.roomie.app.core.ui.theme.RoomieTypography
 import com.roomie.app.features.auth.AuthViewModel
+import com.roomie.app.features.profile.components.HouseholdMembersBottomSheetContent
 import com.roomie.app.features.profile.components.ProfileStat
 import com.roomie.app.features.profile.components.SettingsRow
 import java.util.Locale
@@ -53,8 +59,13 @@ fun ProfileScreen(
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    var showMembersSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+
 
     Scaffold(
         topBar = {
@@ -171,7 +182,7 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(Dimens.SpaceMD))
 
-            SettingsRow(label = "Household Members", onClick = { /* TODO */ })
+            SettingsRow(label = "Household Members", onClick = { showMembersSheet = true })
             Spacer(modifier = Modifier.height(Dimens.SpaceSM))
             SettingsRow(label = "Notifications", onClick = { /* TODO */ })
             Spacer(modifier = Modifier.height(Dimens.SpaceSM))
@@ -198,6 +209,20 @@ fun ProfileScreen(
             }
 
             Spacer(modifier = Modifier.height(Dimens.SpaceLG))
+        }
+    }
+
+    if (showMembersSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showMembersSheet = false },
+            sheetState = sheetState,
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            HouseholdMembersBottomSheetContent(
+                householdName = uiState.householdName,
+                inviteCode = uiState.inviteCode,
+                members = uiState.members
+            )
         }
     }
 }
