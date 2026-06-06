@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import com.roomie.app.core.ui.theme.DestructiveRed
 import com.roomie.app.core.ui.theme.DestructiveRedLight
 import com.roomie.app.core.ui.theme.Dimens
+import com.roomie.app.core.ui.theme.ExpenseRed
+import com.roomie.app.core.ui.theme.StatusCompletedText
 import com.roomie.app.core.ui.theme.SurfaceWhite
 import com.roomie.app.core.ui.theme.TealLight
 import com.roomie.app.core.ui.theme.TealPrimary
@@ -39,9 +41,21 @@ fun DashboardSummaryGrid(summaryState: DashboardSummaryState) {
             icon = Icons.Outlined.Wallet,
             iconBgColor = TealPrimary,
             iconTint = SurfaceWhite,
-            value = "€${summaryState.totalExpenses.toInt()}",
-            label = "Total Expenses",
-            valueColor = MaterialTheme.colorScheme.onSurface
+            value = when {
+                summaryState.netBalance > 0 -> "€${"%.0f".format(summaryState.netBalance)}"
+                summaryState.netBalance < 0 -> "€${"%.0f".format(-summaryState.netBalance)}"
+                else -> "€0"
+            },
+            label = when {
+                summaryState.netBalance > 0 -> "You are owed"
+                summaryState.netBalance < 0 -> "You owe"
+                else -> "All settled"
+            },
+            valueColor = when {
+                summaryState.netBalance < 0 -> ExpenseRed
+                summaryState.netBalance > 0 -> StatusCompletedText
+                else -> MaterialTheme.colorScheme.onSurface
+            }
         ),
         SummaryCardData(
             icon = Icons.Outlined.ShoppingBag,
