@@ -1,7 +1,9 @@
 package com.roomie.app.features.expenses
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,7 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -32,6 +37,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.roomie.app.core.navigation.Screen
+import com.roomie.app.core.ui.components.CategoryChip
 import com.roomie.app.core.ui.components.RoomieBottomNavBar
 import com.roomie.app.core.ui.components.RoomieTopBar
 import com.roomie.app.core.ui.theme.Dimens
@@ -41,6 +47,13 @@ import com.roomie.app.core.ui.theme.TealPrimary
 import com.roomie.app.features.expenses.components.BalanceSummaryRow
 import com.roomie.app.features.expenses.components.ExpenseItem
 import com.roomie.app.features.expenses.components.HouseholdBalanceCard
+
+enum class ExpenseFilter(val label: String) {
+    ALL("All"),
+    UNSETTLED("Unsettled"),
+    MY_SHARE("My Share"),
+    SETTLED("Settled")
+}
 
 @Composable
 fun ExpensesScreen(
@@ -54,6 +67,8 @@ fun ExpensesScreen(
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    var activeFilter by remember { mutableStateOf(ExpenseFilter.ALL) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -122,6 +137,15 @@ fun ExpensesScreen(
                 }
             }
             is ExpenseListState.Success -> {
+                val filteredExpenses = state.expenses.filter { expense ->
+                    when (activeFilter) {
+                        ExpenseFilter.ALL -> true
+                        ExpenseFilter.UNSETTLED -> !expense.isFullySettled()
+                        ExpenseFilter.MY_SHARE -> !expense.isSettledBy(currentUserId) && currentUserId in expense.splitBetween
+                        ExpenseFilter.SETTLED -> expense.isFullySettled()
+                    }
+                }
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -149,24 +173,44 @@ fun ExpensesScreen(
                             color = MaterialTheme.colorScheme.onBackground
                         )
                     }
-                    if (state.expenses.isEmpty()) {
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(Dimens.SpaceSM)
+                        ) {
+                            ExpenseFilter.entries.forEach { filter ->
+                                CategoryChip(
+                                    label = filter.label,
+                                    selected = filter == activeFilter,
+                                    onClick = { activeFilter = filter }
+                                )
+                            }
+                        }
+                    }
+                    if (filteredExpenses.isEmpty()) {
                         item {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = Dimens.SpaceXL),
+                                    .padding(vertical = Dimens.SpaceXXL),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "No expenses yet.\nTap + to add one.",
-                                    style = RoomieTypography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
+                                    text = when (activeFilter) {
+                                        ExpenseFilter.UNSETTLED -> "No unsettled expenses"
+                                        ExpenseFilter.MY_SHARE -> "Your share is settled everywhere"
+                                        ExpenseFilter.SETTLED -> "No fully settled expenses"
+                                        ExpenseFilter.ALL -> "No expenses yet"
+                                    },
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
                     } else {
-                        items(state.expenses, key = { it.id }) { expense ->
+                        items(filteredExpenses, key = { it.id }) { expense ->
                             val members = viewModel.members.collectAsState().value
                             val paidByName = members.find { it.first == expense.paidBy }?.second ?: expense.paidBy
                             val splitCount = expense.splitBetween.size
