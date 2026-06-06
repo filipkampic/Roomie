@@ -37,9 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import com.roomie.app.core.navigation.Screen
-import com.roomie.app.core.ui.components.RoomieBottomNavBar
 import com.roomie.app.core.ui.components.RoomieCard
 import com.roomie.app.core.ui.theme.DestructiveRed
 import com.roomie.app.core.ui.theme.DestructiveRedLight
@@ -49,6 +46,8 @@ import com.roomie.app.features.auth.AuthViewModel
 import com.roomie.app.features.profile.components.HouseholdMembersBottomSheetContent
 import com.roomie.app.features.profile.components.ProfileStat
 import com.roomie.app.features.profile.components.SettingsRow
+import com.roomie.app.features.profile.components.ThemeModeBottomSheetContent
+import com.roomie.app.features.theme.ThemeViewModel
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,16 +55,17 @@ import java.util.Locale
 fun ProfileScreen(
     navController: NavHostController,
     profileViewModel: ProfileViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    themeViewModel: ThemeViewModel = hiltViewModel()
 ) {
     val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
-
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val themeMode by themeViewModel.themeMode.collectAsStateWithLifecycle()
 
     var showMembersSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    var showThemeSheet by remember { mutableStateOf(false) }
+    val themeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Scaffold(
         topBar = {
@@ -90,18 +90,6 @@ fun ProfileScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 )
-            )
-        },
-        bottomBar = {
-            RoomieBottomNavBar(
-                currentRoute = currentRoute,
-                onNavigate = { route ->
-                    navController.navigate(route) {
-                        popUpTo(Screen.Dashboard.route) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -186,7 +174,10 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(Dimens.SpaceSM))
             SettingsRow(label = "Notifications", onClick = { /* TODO */ })
             Spacer(modifier = Modifier.height(Dimens.SpaceSM))
-            SettingsRow(label = "Theme Mode", onClick = { /* TODO */ })
+            SettingsRow(
+                label = "Theme Mode: ${themeMode.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                onClick = { showThemeSheet = true }
+            )
 
             Spacer(modifier = Modifier.height(Dimens.SpaceLG))
 
@@ -222,6 +213,22 @@ fun ProfileScreen(
                 householdName = uiState.householdName,
                 inviteCode = uiState.inviteCode,
                 members = uiState.members
+            )
+        }
+    }
+
+    if (showThemeSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showThemeSheet = false },
+            sheetState = themeSheetState,
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            ThemeModeBottomSheetContent(
+                currentMode = themeMode,
+                onModeSelected = {
+                    themeViewModel.setThemeMode(it)
+                    showThemeSheet = false
+                }
             )
         }
     }
