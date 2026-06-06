@@ -93,7 +93,7 @@ class ShoppingViewModel @Inject constructor(
                 name = name.trim(),
                 quantity = 1,
                 category = ShoppingCategory.GROCERIES.name,
-                addedBy = uid,
+                addedBy = _currentUserId.value,
                 householdId = hId
             )
             shoppingRepository.addItem(item)
@@ -106,8 +106,7 @@ class ShoppingViewModel @Inject constructor(
         name: String,
         quantity: Int,
         category: String,
-        notes: String,
-        addedBy: String
+        notes: String
     ) {
         val hId = _householdId.value.ifEmpty { return }
         viewModelScope.launch {
@@ -117,7 +116,7 @@ class ShoppingViewModel @Inject constructor(
                 quantity = quantity,
                 category = category,
                 notes = notes,
-                addedBy = addedBy,
+                addedBy = _currentUserId.value,
                 householdId = hId
             )
             shoppingRepository.addItem(item)

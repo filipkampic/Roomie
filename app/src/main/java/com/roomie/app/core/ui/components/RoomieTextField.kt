@@ -39,9 +39,9 @@ fun RoomieTextField(
     enabled: Boolean = true,
     trailingIcon: @Composable (() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
-    minLines: Int = 1,
-    maxLines: Int = 1,
     singleLine: Boolean = true,
+    minLines: Int = 1,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
 ) {
@@ -53,7 +53,7 @@ fun RoomieTextField(
         isError = isError,
         singleLine = singleLine,
         minLines = minLines,
-        maxLines = if (singleLine) 1 else maxLines,
+        maxLines = maxLines,
         placeholder = {
             Text(
                 text = placeholder,

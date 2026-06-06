@@ -30,17 +30,6 @@ fun CategoryChipPreview(modifier: Modifier = Modifier) {
     )
 }
 
-@Preview(showBackground = false)
-@Composable
-fun CategoryChipRowPreview(modifier: Modifier = Modifier) {
-    CategoryChipRow(
-        categories = listOf("Cat1", "Cat2", "Cat3", "Cat4"),
-        selectedCategory = "Cat1",
-        onCategorySelected = {},
-        modifier = modifier
-    )
-}
-
 @Composable
 fun CategoryChip(
     label: String,
@@ -72,26 +61,4 @@ fun CategoryChip(
             selectedBorderColor = TealPrimary
         )
     )
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun CategoryChipRow(
-    categories: List<String>,
-    selectedCategory: String,
-    onCategorySelected: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    FlowRow(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(Dimens.SpaceSM)
-    ) {
-        categories.forEach { category ->
-            CategoryChip(
-                label = category,
-                selected = selectedCategory == category,
-                onClick = { onCategorySelected(category) }
-            )
-        }
-    }
 }

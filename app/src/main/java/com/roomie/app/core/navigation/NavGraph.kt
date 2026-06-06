@@ -22,7 +22,7 @@ import com.roomie.app.features.household.HouseholdSetupScreen
 import com.roomie.app.features.household.JoinHouseholdScreen
 import com.roomie.app.features.profile.ProfileScreen
 import com.roomie.app.features.shopping.ShoppingScreen
-import com.roomie.app.features.shopping.components.AddShoppingItemScreen
+import com.roomie.app.features.shopping.AddShoppingItemScreen
 
 @Composable
 fun NavGraph(
