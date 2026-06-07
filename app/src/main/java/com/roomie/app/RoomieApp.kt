@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.roomie.app.core.notifications.NotificationHelper
+import com.roomie.app.core.notifications.NotificationScheduler
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -16,6 +17,8 @@ class RoomieApp : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         NotificationHelper.createNotificationChannels(this)
+        NotificationScheduler.scheduleChoreReminders(this)
+        NotificationScheduler.scheduleOverdueAlerts(this)
     }
 
     override val workManagerConfiguration: Configuration

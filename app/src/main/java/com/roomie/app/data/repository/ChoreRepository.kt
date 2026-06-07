@@ -76,4 +76,16 @@ class ChoreRepository @Inject constructor(
         updateChore(chore.copy(completed = !chore.completed))
 
     fun currentUserId(): String? = auth.currentUser?.uid
+
+    suspend fun getChoresSnapshot(householdId: String): List<Chore> {
+        return try {
+            choresCollection(householdId)
+                .get()
+                .await()
+                .documents
+                .mapNotNull { it.toObject(Chore::class.java) }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
 }
