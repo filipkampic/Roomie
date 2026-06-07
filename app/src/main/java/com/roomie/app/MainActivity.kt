@@ -15,11 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.roomie.app.core.navigation.NavGraph
-import com.roomie.app.core.notifications.ChoreReminderWorker
-import com.roomie.app.core.notifications.OverdueAlertWorker
 import com.roomie.app.core.ui.theme.RoomieTheme
 import com.roomie.app.data.repository.ThemeMode
 import com.roomie.app.features.auth.AuthViewModel

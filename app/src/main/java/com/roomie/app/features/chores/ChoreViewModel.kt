@@ -178,7 +178,13 @@ class ChoreViewModel @Inject constructor(
                 notes = notes
             )
             choreRepository.updateChore(chore)
-                .onSuccess { _actionState.value = ChoreActionState.Success }
+                .onSuccess {
+                    val previousAssignee = _editChore.value?.assignedTo
+                    if (assignedTo != _currentUserId.value && assignedTo != previousAssignee) {
+                        sendChoreAssignedNotification(assignedTo, title)
+                    }
+                    _actionState.value = ChoreActionState.Success
+                }
                 .onFailure { e -> _actionState.value = ChoreActionState.Error(e.message ?: "Failed to update chore") }
         }
     }
