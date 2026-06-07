@@ -3,10 +3,8 @@ package com.roomie.app.features.expenses.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,23 +57,18 @@ private fun BalanceCard(
                 .padding(Dimens.CardPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = label,
-                    style = RoomieTypography.bodySmall,
-                    color = amountColor
-                )
-                Spacer(modifier = Modifier.width(Dimens.SpaceXS))
-                Text(
-                    text = "€${"%.2f".format(amount)}",
-                    style = RoomieTypography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            Text(
+                text = label,
+                style = RoomieTypography.bodySmall,
+                color = amountColor
+            )
+            Text(
+                text = "€${"%.2f".format(amount)}",
+                style = RoomieTypography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1
+            )
         }
     }
 }
