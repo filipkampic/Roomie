@@ -1,3 +1,6 @@
+import java.util.Base64
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -24,6 +27,20 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.inputStream())
+        }
+
+        val privateKey = (localProperties["FCM_PRIVATE_KEY"] as? String ?: "")
+        val privateKeyBase64 = Base64.getEncoder().encodeToString(privateKey.toByteArray())
+
+        buildConfigField("String", "FCM_PROJECT_ID", "\"${localProperties["FCM_PROJECT_ID"] ?: ""}\"")
+        buildConfigField("String", "FCM_PRIVATE_KEY_ID", "\"${localProperties["FCM_PRIVATE_KEY_ID"] ?: ""}\"")
+        buildConfigField("String", "FCM_PRIVATE_KEY_BASE64", "\"${privateKeyBase64}\"")
+        buildConfigField("String", "FCM_CLIENT_EMAIL", "\"${localProperties["FCM_CLIENT_EMAIL"] ?: ""}\"")
     }
 
     buildTypes {
@@ -41,6 +58,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -93,6 +111,9 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.10.1")
     implementation("androidx.hilt:hilt-work:1.2.0")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
+
+    // Firebase Messaging
+    implementation(libs.firebase.messaging)
 
     // Test
     testImplementation(libs.junit)

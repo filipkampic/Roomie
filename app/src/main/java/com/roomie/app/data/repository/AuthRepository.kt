@@ -3,6 +3,7 @@ package com.roomie.app.data.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.roomie.app.data.model.User
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -18,7 +19,9 @@ class AuthRepository @Inject constructor(
     suspend fun login(email: String, password: String): Result<FirebaseUser> {
         return try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
-            Result.success(result.user!!)
+            val user = result.user!!
+            saveFcmToken(user.uid)
+            Result.success(user)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -27,7 +30,9 @@ class AuthRepository @Inject constructor(
     suspend fun register(email: String, password: String): Result<FirebaseUser> {
         return try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
-            Result.success(result.user!!)
+            val user = result.user!!
+            saveFcmToken(user.uid)
+            Result.success(user)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -82,6 +87,17 @@ class AuthRepository @Inject constructor(
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    private suspend fun saveFcmToken(uid: String) {
+        try {
+            val token = FirebaseMessaging.getInstance().token.await()
+            firestore.collection("users").document(uid)
+                .update("fcmToken", token)
+                .await()
+        } catch (e: Exception) {
+
         }
     }
 }
