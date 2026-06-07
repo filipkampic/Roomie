@@ -108,7 +108,7 @@ class FcmRepository @Inject constructor() {
                 val message = JSONObject().apply {
                     put("message", JSONObject().apply {
                         put("token", token)
-                        put("notification", JSONObject().apply {
+                        put("data", JSONObject().apply {
                             put("title", title)
                             put("body", body)
                         })
