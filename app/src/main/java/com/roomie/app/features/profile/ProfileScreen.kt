@@ -1,5 +1,6 @@
 package com.roomie.app.features.profile
 
+import android.R.attr.onClick
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -66,6 +67,8 @@ fun ProfileScreen(
 
     var showThemeSheet by remember { mutableStateOf(false) }
     val themeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val notificationsEnabled by themeViewModel.notificationsEnabled.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -172,7 +175,10 @@ fun ProfileScreen(
 
             SettingsRow(label = "Household Members", onClick = { showMembersSheet = true })
             Spacer(modifier = Modifier.height(Dimens.SpaceSM))
-            SettingsRow(label = "Notifications", onClick = { /* TODO */ })
+            SettingsRow(
+                label = if (notificationsEnabled) "Notifications: On" else "Notifications: Off",
+                onClick = { themeViewModel.setNotificationsEnabled(!notificationsEnabled) }
+            )
             Spacer(modifier = Modifier.height(Dimens.SpaceSM))
             SettingsRow(
                 label = "Theme Mode: ${themeMode.name.lowercase().replaceFirstChar { it.uppercase() }}",
