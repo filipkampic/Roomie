@@ -115,6 +115,11 @@ dependencies {
     // Firebase Messaging
     implementation(libs.firebase.messaging)
 
+    // JWT
+    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
+
     // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
