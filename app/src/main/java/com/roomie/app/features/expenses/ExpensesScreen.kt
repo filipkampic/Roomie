@@ -93,8 +93,8 @@ fun ExpensesScreen(
         topBar = {
             RoomieTopBar(
                 title = "Expenses",
-                onMenuClick = {  },
-                onProfileClick = { navController.navigate(Screen.Profile.route) }
+                onProfileClick = { navController.navigate(Screen.Profile.route) },
+                onNotificationsClick = { navController.navigate(Screen.Notifications.route) }
             )
         },
         bottomBar = {

@@ -20,4 +20,6 @@ sealed class Screen(val route: String) {
 
     object AddShopping : Screen("add_shopping") { fun editRoute(itemId: String) = "add_shopping?itemId=$itemId" }
     object Profile : Screen("profile")
+
+    object Notifications : Screen("notifications")
 }

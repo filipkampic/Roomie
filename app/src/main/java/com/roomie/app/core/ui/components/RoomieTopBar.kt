@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,8 +31,8 @@ import com.roomie.app.core.ui.theme.TealPrimary
 fun RoomieTopBarPreview() {
     RoomieTopBar(
         title = "Title",
-        onMenuClick = {},
-        onProfileClick = {}
+        onProfileClick = {},
+        onNotificationsClick = {}
     )
 }
 
@@ -40,8 +40,8 @@ fun RoomieTopBarPreview() {
 @Composable
 fun RoomieTopBar(
     title: String,
-    onMenuClick: (() -> Unit)? = null,
-    onProfileClick: (() -> Unit)? = null
+    onProfileClick: (() -> Unit)? = null,
+    onNotificationsClick: (() -> Unit)? = null
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -52,12 +52,12 @@ fun RoomieTopBar(
             )
         },
         navigationIcon = {
-            if (onMenuClick != null) {
-                IconButton(onClick = onMenuClick) {
+            if (onNotificationsClick != null) {
+                IconButton(onClick = onNotificationsClick) {
                     Icon(
-                        imageVector = Icons.Filled.Menu,
-                        contentDescription = "Menu",
-                        tint = MaterialTheme.colorScheme.onSurface,
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = "Notifications",
+                        tint = TealPrimary,
                         modifier = Modifier.size(Dimens.IconSizeMD)
                     )
                 }

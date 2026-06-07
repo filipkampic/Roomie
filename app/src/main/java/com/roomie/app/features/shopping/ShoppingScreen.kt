@@ -79,8 +79,8 @@ fun ShoppingScreen(
         topBar = {
             RoomieTopBar(
                 title = "Shopping List",
-                onMenuClick = { },
-                onProfileClick = { navController.navigate(Screen.Profile.route) }
+                onProfileClick = { navController.navigate(Screen.Profile.route) },
+                onNotificationsClick = { navController.navigate(Screen.Notifications.route) }
             )
         },
         bottomBar = {

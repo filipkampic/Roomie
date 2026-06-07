@@ -20,6 +20,7 @@ import com.roomie.app.features.expenses.ExpensesScreen
 import com.roomie.app.features.household.CreateHouseholdScreen
 import com.roomie.app.features.household.HouseholdSetupScreen
 import com.roomie.app.features.household.JoinHouseholdScreen
+import com.roomie.app.features.notifications.NotificationsScreen
 import com.roomie.app.features.profile.ProfileScreen
 import com.roomie.app.features.shopping.ShoppingScreen
 import com.roomie.app.features.shopping.AddShoppingItemScreen
@@ -94,6 +95,10 @@ fun NavGraph(
         }
         composable(Screen.Profile.route) {
             ProfileScreen(navController = navController)
+        }
+
+        composable(Screen.Notifications.route) {
+            NotificationsScreen(navController = navController)
         }
     }
 }

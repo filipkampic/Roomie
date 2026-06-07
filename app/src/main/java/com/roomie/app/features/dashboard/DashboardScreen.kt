@@ -47,10 +47,8 @@ fun DashboardScreen(
         topBar = {
             RoomieTopBar(
                 title = "Roomie",
-                onMenuClick = { /* TODO */ },
-                onProfileClick = {
-                    navController.navigate(Screen.Profile.route)
-                }
+                onProfileClick = { navController.navigate(Screen.Profile.route) },
+                onNotificationsClick = { navController.navigate(Screen.Notifications.route) }
             )
         },
         bottomBar = {
