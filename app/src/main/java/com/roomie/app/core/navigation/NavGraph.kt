@@ -1,5 +1,8 @@
 package com.roomie.app.core.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,7 +39,11 @@ fun NavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = startDestination!!
+        startDestination = startDestination!!,
+        enterTransition = { fadeIn(tween(250)) },
+        exitTransition = { fadeOut(tween(250)) },
+        popEnterTransition = { fadeIn(tween(250)) },
+        popExitTransition = { fadeOut(tween(250)) }
     ) {
         // Auth
         composable(Screen.Login.route) {
