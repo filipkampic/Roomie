@@ -65,4 +65,14 @@ class NotificationRepository @Inject constructor(
             emptyList()
         }
     }
+
+    suspend fun getFcmToken(uid: String): String? {
+        return try {
+            firestore.collection("users").document(uid)
+                .get().await()
+                .getString("fcmToken")
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

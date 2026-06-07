@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.roomie.app.data.model.Chore
 import com.roomie.app.data.repository.AuthRepository
 import com.roomie.app.data.repository.ChoreRepository
+import com.roomie.app.data.repository.FcmRepository
 import com.roomie.app.data.repository.HouseholdRepository
+import com.roomie.app.data.repository.NotificationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +33,9 @@ sealed class ChoreActionState {
 class ChoreViewModel @Inject constructor(
     private val choreRepository: ChoreRepository,
     private val authRepository: AuthRepository,
-    private val householdRepository: HouseholdRepository
+    private val householdRepository: HouseholdRepository,
+    private val notificationRepository: NotificationRepository,
+    private val fcmRepository: FcmRepository
 ) : ViewModel() {
 
     private val _listState = MutableStateFlow<ChoreListState>(ChoreListState.Loading)
@@ -114,7 +118,12 @@ class ChoreViewModel @Inject constructor(
                 notes = notes
             )
             choreRepository.addChore(chore)
-                .onSuccess { _actionState.value = ChoreActionState.Success }
+                .onSuccess {
+                    if (assignedTo != _currentUserId.value) {
+                        sendChoreAssignedNotification(assignedTo, title)
+                    }
+                    _actionState.value = ChoreActionState.Success
+                }
                 .onFailure { _actionState.value = ChoreActionState.Error(it.message ?: "Failed to update chore") }
         }
     }
@@ -171,6 +180,19 @@ class ChoreViewModel @Inject constructor(
             choreRepository.updateChore(chore)
                 .onSuccess { _actionState.value = ChoreActionState.Success }
                 .onFailure { e -> _actionState.value = ChoreActionState.Error(e.message ?: "Failed to update chore") }
+        }
+    }
+
+    private suspend fun sendChoreAssignedNotification(assignedToUid: String, choreTitle: String) {
+        try {
+            val token = notificationRepository.getFcmToken(assignedToUid) ?: return
+            fcmRepository.sendNotificationToTokens(
+                tokens = listOf(token),
+                title = "New Chore Assigned",
+                body = "\"$choreTitle\" has been assigned to you."
+            )
+        } catch (e: Exception) {
+
         }
     }
 }

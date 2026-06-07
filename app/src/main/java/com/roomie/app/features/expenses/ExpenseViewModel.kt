@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.roomie.app.data.model.Expense
 import com.roomie.app.data.repository.AuthRepository
 import com.roomie.app.data.repository.ExpenseRepository
+import com.roomie.app.data.repository.FcmRepository
 import com.roomie.app.data.repository.HouseholdRepository
+import com.roomie.app.data.repository.NotificationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +32,9 @@ sealed class ExpenseActionState {
 class ExpenseViewModel @Inject constructor(
     private val expenseRepository: ExpenseRepository,
     private val authRepository: AuthRepository,
-    private val householdRepository: HouseholdRepository
+    private val householdRepository: HouseholdRepository,
+    private val notificationRepository: NotificationRepository,
+    private val fcmRepository: FcmRepository
 )  : ViewModel() {
 
     private val _listState = MutableStateFlow<ExpenseListState>(ExpenseListState.Loading)
@@ -121,7 +125,10 @@ class ExpenseViewModel @Inject constructor(
                 category = category
             )
             expenseRepository.addExpense(expense)
-                .onSuccess { _actionState.value = ExpenseActionState.Success }
+                .onSuccess {
+                    sendExpenseNotification(expense)
+                    _actionState.value = ExpenseActionState.Success
+                }
                 .onFailure { _actionState.value = ExpenseActionState.Error(it.message ?: "Failed to add expense") }
         }
     }
@@ -142,6 +149,29 @@ class ExpenseViewModel @Inject constructor(
         viewModelScope.launch {
             expenseRepository.settleExpense(expense.householdId, expense.id, uid)
                 .onFailure { _actionState.value = ExpenseActionState.Error(it.message ?: "Failed to settle expense") }
+        }
+    }
+
+    private suspend fun sendExpenseNotification(expense: Expense) {
+        try {
+            val currentUserName = authRepository.fetchCurrentUser()?.name ?: return
+            val splitCount = expense.splitBetween.size
+            val shareAmount = if (splitCount > 0) expense.amount / splitCount else 0.0
+            val body = "$currentUserName paid €${"%.2f".format(expense.amount)} for ${expense.title} — you owe €${"%.2f".format(shareAmount)}"
+
+            val tokens = expense.splitBetween
+                .filter { it != _currentUserId.value }
+                .mapNotNull { notificationRepository.getFcmToken(it) }
+
+            if (tokens.isNotEmpty()) {
+                fcmRepository.sendNotificationToTokens(
+                    tokens = tokens,
+                    title = "New Expense Added",
+                    body = body
+                )
+            }
+        } catch (e: Exception) {
+
         }
     }
 }
