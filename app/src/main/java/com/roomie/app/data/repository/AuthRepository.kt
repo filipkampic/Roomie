@@ -100,4 +100,9 @@ class AuthRepository @Inject constructor(
 
         }
     }
+
+    suspend fun refreshFcmToken(): Unit {
+        val uid = auth.currentUser?.uid ?: return
+        saveFcmToken(uid)
+    }
 }

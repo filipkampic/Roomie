@@ -2,10 +2,7 @@ package com.roomie.app.data.repository
 
 import android.util.Base64
 import android.util.Log
-import com.google.api.Http
 import com.roomie.app.BuildConfig
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -14,7 +11,6 @@ import java.net.URL
 import java.security.KeyFactory
 import java.security.PrivateKey
 import java.security.spec.PKCS8EncodedKeySpec
-import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,18 +36,33 @@ class FcmRepository @Inject constructor() {
     }
 
     private fun generateOAuthToken(): String {
-        val now = Date()
-        val expiry = Date(now.time + 3600 * 1000)
+        val now = System.currentTimeMillis() / 1000
+        val expiry = now + 3600
 
-        return Jwts.builder()
-            .setIssuer(clientEmail)
-            .setAudience("https://oauth2.googleapis.com/token")
-            .setIssuedAt(now)
-            .setExpiration(expiry)
-            .claim("scope", "https://www.googleapis.com/auth/firebase.messaging")
-            .setHeaderParam("kid", privateKeyId)
-            .signWith(getPrivateKey(), SignatureAlgorithm.RS256)
-            .compact()
+        val header = """{"alg":"RS256","typ":"JWT","kid":"$privateKeyId"}"""
+        val payload = """{"iss":"$clientEmail","sub":"$clientEmail","aud":"https://oauth2.googleapis.com/token","iat":$now,"exp":$expiry,"scope":"https://www.googleapis.com/auth/firebase.messaging"}"""
+
+        val headerEncoded = Base64.encodeToString(
+            header.toByteArray(Charsets.UTF_8),
+            Base64.NO_WRAP or Base64.URL_SAFE or Base64.NO_PADDING
+        )
+        val payloadEncoded = Base64.encodeToString(
+            payload.toByteArray(Charsets.UTF_8),
+            Base64.NO_WRAP or Base64.URL_SAFE or Base64.NO_PADDING
+        )
+
+        val signingInput = "$headerEncoded.$payloadEncoded"
+
+        val signature = java.security.Signature.getInstance("SHA256withRSA").apply {
+            initSign(getPrivateKey())
+            update(signingInput.toByteArray(Charsets.UTF_8))
+        }.sign()
+
+        val signatureEncoded = Base64.encodeToString(
+            signature, Base64.NO_WRAP or Base64.URL_SAFE or Base64.NO_PADDING
+        )
+
+        return "$signingInput.$signatureEncoded"
     }
 
     private suspend fun getAccessToken(): String = withContext(Dispatchers.IO) {
@@ -65,6 +76,13 @@ class FcmRepository @Inject constructor() {
 
         val body = "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=$jst"
         connection.outputStream.write(body.toByteArray())
+
+        val responseCode = connection.responseCode
+
+        if (responseCode != 200) {
+            val error = connection.errorStream?.bufferedReader()?.readText()
+            throw Exception("OAuth failed: $error")
+        }
 
         val response = connection.inputStream.bufferedReader().readText()
         val json = JSONObject(response)
@@ -101,8 +119,7 @@ class FcmRepository @Inject constructor() {
 
                 val responseCode = connection.responseCode
                 if (responseCode != 200) {
-                    val error = connection.errorStream?.bufferedReader()?.readText()
-                    Log.e("FCM", "Failed to send to $token: $error")
+                    connection.errorStream?.bufferedReader()?.readText()
                 }
             }
 

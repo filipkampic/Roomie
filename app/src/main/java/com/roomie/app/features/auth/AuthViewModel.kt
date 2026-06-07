@@ -42,6 +42,9 @@ class AuthViewModel @Inject constructor(
             }
             _startDestination.value = destination
         }
+        viewModelScope.launch {
+            authRepository.refreshFcmToken()
+        }
     }
 
     fun login(email: String, password: String) {
