@@ -3,6 +3,7 @@ package com.roomie.app
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.roomie.app.core.notifications.NotificationHelper
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -11,6 +12,11 @@ class RoomieApp : Application(), Configuration.Provider {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
+
+    override fun onCreate() {
+        super.onCreate()
+        NotificationHelper.createNotificationChannels(this)
+    }
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
