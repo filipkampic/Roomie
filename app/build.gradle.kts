@@ -89,6 +89,11 @@ dependencies {
     // Splash Screen
     implementation("androidx.core:core-splashscreen:1.2.0")
 
+    // WorkManager
+    implementation("androidx.work:work-runtime-ktx:2.10.1")
+    implementation("androidx.hilt:hilt-work:1.2.0")
+    ksp("androidx.hilt:hilt-compiler:1.2.0")
+
     // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
