@@ -40,10 +40,10 @@ fun NavGraph(
     NavHost(
         navController = navController,
         startDestination = startDestination!!,
-        enterTransition = { fadeIn(tween(250)) },
-        exitTransition = { fadeOut(tween(250)) },
-        popEnterTransition = { fadeIn(tween(250)) },
-        popExitTransition = { fadeOut(tween(250)) }
+        enterTransition = { fadeIn(tween(400)) },
+        exitTransition = { fadeOut(tween(400)) },
+        popEnterTransition = { fadeIn(tween(400)) },
+        popExitTransition = { fadeOut(tween(400)) }
     ) {
         // Auth
         composable(Screen.Login.route) {
