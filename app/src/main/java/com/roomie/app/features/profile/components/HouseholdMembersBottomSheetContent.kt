@@ -3,6 +3,7 @@ package com.roomie.app.features.profile.components
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -81,6 +83,24 @@ fun HouseholdMembersBottomSheetContent(
                 Icon(
                     imageVector = Icons.Default.ContentCopy,
                     contentDescription = "Copy",
+                    tint = TealPrimary,
+                    modifier = Modifier.size(Dimens.IconSizeMD)
+                )
+            }
+            IconButton(
+                onClick = {
+                    val sendIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, "Join my household on Roomie! Use invite code: $inviteCode")
+                        type = "text/plain"
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, "Share invite code")
+                    context.startActivity(shareIntent)
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = "Share",
                     tint = TealPrimary,
                     modifier = Modifier.size(Dimens.IconSizeMD)
                 )
