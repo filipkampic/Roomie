@@ -40,6 +40,12 @@ class ThemeViewModel @Inject constructor(
         }
     }
 
+    fun resetToSystem() {
+        viewModelScope.launch {
+            themeRepository.setThemeMode(ThemeMode.SYSTEM)
+        }
+    }
+
     fun setNotificationsEnabled(enabled: Boolean) {
         viewModelScope.launch {
             themeRepository.setNotificationsEnabled(enabled)

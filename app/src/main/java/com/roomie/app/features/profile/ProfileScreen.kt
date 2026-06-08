@@ -203,7 +203,10 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(Dimens.SpaceLG))
 
             Button(
-                onClick = { authViewModel.logout(navController) },
+                onClick = {
+                    themeViewModel.resetToSystem()
+                    authViewModel.logout(navController)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(Dimens.ButtonHeight),
