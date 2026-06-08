@@ -83,4 +83,27 @@ class HouseholdRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    suspend fun leaveHousehold(householdId: String, uid: String): Result<Unit> {
+        return try {
+            val householdRef = householdsCollection.document(householdId)
+            val household = householdRef.get().await().toObject(Household::class.java) ?: return Result.failure(Exception("Household not found"))
+
+            val updatedMembers = household.members.filter { it != uid }
+
+            if (updatedMembers.isEmpty()) {
+                householdRef.delete().await()
+            } else {
+                householdRef.update("members", updatedMembers).await()
+            }
+
+            usersCollection.document(uid)
+                .update("householdId", "")
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

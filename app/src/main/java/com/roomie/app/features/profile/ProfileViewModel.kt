@@ -39,6 +39,9 @@ class ProfileViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState
 
+    private val _leaveHouseholdState = MutableStateFlow(false)
+    val leaveHouseholdState: StateFlow<Boolean> = _leaveHouseholdState
+
     init {
         loadProfile()
     }
@@ -85,6 +88,18 @@ class ProfileViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false)
             }
+        }
+    }
+
+    fun leaveHousehold() {
+        viewModelScope.launch {
+            val user = authRepository.fetchCurrentUser() ?: return@launch
+            val hId = user.householdId.ifEmpty { return@launch }
+            val uid = user.id
+
+            householdRepository.leaveHousehold(hId, uid)
+                .onSuccess { _leaveHouseholdState.value = true }
+                .onFailure {  }
         }
     }
 }

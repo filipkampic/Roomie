@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,10 +25,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.roomie.app.core.navigation.Screen
 import com.roomie.app.core.ui.components.RoomieCard
 import com.roomie.app.core.ui.theme.DestructiveRed
 import com.roomie.app.core.ui.theme.DestructiveRedLight
@@ -69,6 +73,17 @@ fun ProfileScreen(
     val themeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val notificationsEnabled by themeViewModel.notificationsEnabled.collectAsStateWithLifecycle()
+
+    val leaveHouseholdState by profileViewModel.leaveHouseholdState.collectAsStateWithLifecycle()
+    var showLeaveDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(leaveHouseholdState) {
+        if (leaveHouseholdState) {
+            navController.navigate(Screen.HouseholdSetup.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -205,6 +220,26 @@ fun ProfileScreen(
                 )
             }
 
+            Spacer(modifier = Modifier.height(Dimens.SpaceSM))
+
+            Button(
+                onClick = { showLeaveDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimens.ButtonHeight),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                shape = MaterialTheme.shapes.large
+            ) {
+                Text(
+                    text = "Leave Household",
+                    style = RoomieTypography.labelLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
             Spacer(modifier = Modifier.height(Dimens.SpaceLG))
         }
     }
@@ -237,5 +272,27 @@ fun ProfileScreen(
                 }
             )
         }
+    }
+
+    if (showLeaveDialog) {
+        AlertDialog(
+            onDismissRequest = { showLeaveDialog = false },
+            containerColor = MaterialTheme.colorScheme.surface,
+            title = { Text("Leave Household") },
+            text = { Text("Are you sure you want to leave this household? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showLeaveDialog = false
+                    profileViewModel.leaveHousehold()
+                }) {
+                    Text("Leave", color = DestructiveRed)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLeaveDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
