@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -60,6 +61,9 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var showResetDialog by remember { mutableStateOf(false) }
+    var resetEmail by remember { mutableStateOf("") }
+    var resetSent by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState) {
         if (uiState is AuthUiState.Success) {
@@ -168,7 +172,7 @@ fun LoginScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
                     ) {
-                        TextButton(onClick = { /* TODO: Password reset */ }) {
+                        TextButton(onClick = { showResetDialog = true }) {
                             Text(
                                 text = "Forgot Password?",
                                 style = MaterialTheme.typography.bodyMedium,
@@ -208,5 +212,61 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(Dimens.SpaceLG))
         }
+    }
+
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showResetDialog = false
+                resetSent = false
+                resetEmail = ""
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            title = { Text("Reset Password") },
+            text = {
+                if (resetSent) {
+                    Text("Password reset email sent to $resetEmail")
+                } else {
+                    Column {
+                        Text("Enter your email address")
+                        Spacer(modifier = Modifier.height(Dimens.SpaceSM))
+                        RoomieTextField(
+                            value = resetEmail,
+                            onValueChange = { resetEmail = it },
+                            placeholder = "Email Address",
+                            singleLine = true
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                if (!resetSent) {
+                    TextButton(
+                        onClick = {
+                            viewModel.sendPasswordReset(resetEmail)
+                            resetSent = true
+                        },
+                        enabled = resetEmail.isNotBlank()
+                    ) {
+                        Text("Send", color = TealPrimary)
+                    }
+                } else {
+                    TextButton(onClick = {
+                        showResetDialog = false
+                        resetSent = false
+                        resetEmail = ""
+                    }) {
+                        Text("OK", color = TealPrimary)
+                    }
+                }
+            },
+            dismissButton = {
+                if (!resetSent) {
+                    TextButton(onClick = { showResetDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            }
+        )
     }
 }

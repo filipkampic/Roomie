@@ -80,6 +80,12 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    fun sendPasswordReset(email: String) {
+        viewModelScope.launch {
+            authRepository.sendPasswordResetEmail(email)
+        }
+    }
+
     fun resetState() {
         _uiState.value = AuthUiState.Idle
     }
