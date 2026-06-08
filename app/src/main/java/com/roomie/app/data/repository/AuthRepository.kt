@@ -1,3 +1,127 @@
 package com.roomie.app.data.repository
 
-class AuthRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
+import com.google.firebase.messaging.FirebaseMessaging
+import com.roomie.app.data.model.User
+import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class AuthRepository @Inject constructor(
+    private val auth: FirebaseAuth,
+    private val firestore: FirebaseFirestore
+) {
+    val currentUser: FirebaseUser? get() = auth.currentUser
+
+    suspend fun login(email: String, password: String): Result<FirebaseUser> {
+        return try {
+            val result = auth.signInWithEmailAndPassword(email, password).await()
+            val user = result.user!!
+            saveFcmToken(user.uid)
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun register(email: String, password: String): Result<FirebaseUser> {
+        return try {
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val user = result.user!!
+            saveFcmToken(user.uid)
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    fun logout() {
+        auth.signOut()
+    }
+
+    suspend fun saveUser(uid: String, name: String, email: String): Result<Unit> {
+        return try {
+            val user = User(id = uid, name = name, email = email)
+            firestore.collection("users").document(uid).set(user).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun fetchCurrentUser(): User? {
+        val uid = auth.currentUser?.uid ?: return null
+        return try {
+            val doc = firestore.collection("users").document(uid).get().await()
+            doc.toObject(User::class.java)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun fetchUserName(uid: String): String? {
+        return try {
+            val doc = firestore.collection("users").document(uid).get().await()
+            doc.getString("name")
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun fetchCurrentUserHouseholdId(): String? {
+        val uid = auth.currentUser?.uid ?: return null
+        return try {
+            val doc = firestore.collection("users").document(uid)
+                .get(Source.SERVER)
+                .await()
+            doc.getString("householdId").takeIf { !it.isNullOrEmpty() }
+        } catch (e: Exception) {
+            try {
+                val doc = firestore.collection("users").document(uid)
+                    .get(Source.CACHE)
+                    .await()
+                doc.getString("householdId").takeIf { !it.isNullOrEmpty() }
+            } catch (e2: Exception) {
+                null
+            }
+        }
+    }
+
+    suspend fun deleteCurrentUser(): Result<Unit> {
+        return try {
+            auth.currentUser?.delete()?.await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun sendPasswordResetEmail(email: String): Result<Unit> {
+        return try {
+            auth.sendPasswordResetEmail(email).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    private suspend fun saveFcmToken(uid: String) {
+        try {
+            val token = FirebaseMessaging.getInstance().token.await()
+            firestore.collection("users").document(uid)
+                .update("fcmToken", token)
+                .await()
+        } catch (e: Exception) {
+
+        }
+    }
+
+    suspend fun refreshFcmToken(): Unit {
+        val uid = auth.currentUser?.uid ?: return
+        saveFcmToken(uid)
+    }
+}

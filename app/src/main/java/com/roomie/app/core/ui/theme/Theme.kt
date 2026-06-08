@@ -1,57 +1,57 @@
 package com.roomie.app.core.ui.theme
 
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = TealPrimary,
+    onPrimary  = SurfaceWhite,
+    primaryContainer = TealPrimary,
+    onPrimaryContainer = TealDark,
+    secondary = NavySecondary,
+    onSecondary = SurfaceWhite,
+    background = BackgroundLight,
+    onBackground = NavyPrimary,
+    surface = SurfaceWhite,
+    onSurface = NavyPrimary,
+    surfaceVariant = InputBackground,
+    onSurfaceVariant = NavySecondary,
+    outline = InputBorder,
+    error = DestructiveRed,
+    onError = SurfaceWhite,
+)
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+private val DarkColorScheme = darkColorScheme(
+    primary = TealPrimaryDark,
+    onPrimary = BackgroundDark,
+    primaryContainer = TealDark,
+    onPrimaryContainer = TealLight,
+    secondary = NavySecondaryDark,
+    onSecondary = BackgroundDark,
+    background = BackgroundDark,
+    onBackground = NavyPrimaryDark,
+    surface = SurfaceDark,
+    onSurface = NavyPrimaryDark,
+    surfaceVariant = SurfaceDark,
+    onSurfaceVariant = NavySecondaryDark,
+    outline = NavySecondary,
+    error = DestructiveRed,
+    onError = SurfaceWhite,
 )
 
 @Composable
 fun RoomieTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = RoomieTypography,
+        shapes = RoomieShapes,
         content = content
     )
 }
