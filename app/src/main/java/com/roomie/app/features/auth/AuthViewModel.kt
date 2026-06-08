@@ -37,7 +37,7 @@ class AuthViewModel @Inject constructor(
             val householdId = authRepository.fetchCurrentUserHouseholdId()
             val destination = when {
                 authRepository.currentUser == null -> Screen.Login.route
-                householdId != null -> Screen.Dashboard.route
+                !householdId.isNullOrEmpty() -> Screen.Dashboard.route
                 else -> Screen.HouseholdSetup.route
             }
             _startDestination.value = destination
@@ -51,7 +51,15 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
             authRepository.login(email, password)
-                .onSuccess { _uiState.value = AuthUiState.Success(it) }
+                .onSuccess { user ->
+                    val householdId = authRepository.fetchCurrentUserHouseholdId()
+                    if (householdId.isNullOrEmpty()) {
+                        _startDestination.value = Screen.HouseholdSetup.route
+                    } else {
+                        _startDestination.value = Screen.Dashboard.route
+                    }
+                    _uiState.value = AuthUiState.Success(user)
+                }
                 .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "Login failed") }
         }
     }

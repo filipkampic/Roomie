@@ -68,7 +68,8 @@ fun LoginScreen(
     LaunchedEffect(uiState) {
         if (uiState is AuthUiState.Success) {
             viewModel.resetState()
-            navController.navigate(Screen.Dashboard.route) {
+            val destination = viewModel.startDestination.value ?: Screen.Dashboard.route
+            navController.navigate(destination) {
                 popUpTo(Screen.Login.route) { inclusive = true }
             }
         }

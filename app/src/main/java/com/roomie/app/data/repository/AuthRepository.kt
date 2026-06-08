@@ -3,6 +3,7 @@ package com.roomie.app.data.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.google.firebase.messaging.FirebaseMessaging
 import com.roomie.app.data.model.User
 import kotlinx.coroutines.tasks.await
@@ -74,7 +75,7 @@ class AuthRepository @Inject constructor(
     suspend fun fetchCurrentUserHouseholdId(): String? {
         val uid = auth.currentUser?.uid ?: return null
         return try {
-            val doc = firestore.collection("users").document(uid).get().await()
+            val doc = firestore.collection("users").document(uid).get(Source.SERVER).await()
             doc.getString("householdId").takeIf { !it.isNullOrEmpty() }
         } catch (e: Exception) {
             null
