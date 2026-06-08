@@ -75,10 +75,19 @@ class AuthRepository @Inject constructor(
     suspend fun fetchCurrentUserHouseholdId(): String? {
         val uid = auth.currentUser?.uid ?: return null
         return try {
-            val doc = firestore.collection("users").document(uid).get(Source.SERVER).await()
+            val doc = firestore.collection("users").document(uid)
+                .get(Source.SERVER)
+                .await()
             doc.getString("householdId").takeIf { !it.isNullOrEmpty() }
         } catch (e: Exception) {
-            null
+            try {
+                val doc = firestore.collection("users").document(uid)
+                    .get(Source.CACHE)
+                    .await()
+                doc.getString("householdId").takeIf { !it.isNullOrEmpty() }
+            } catch (e2: Exception) {
+                null
+            }
         }
     }
 
