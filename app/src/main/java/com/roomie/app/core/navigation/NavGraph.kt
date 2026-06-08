@@ -3,9 +3,12 @@ package com.roomie.app.core.navigation
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -40,6 +43,7 @@ fun NavGraph(
     NavHost(
         navController = navController,
         startDestination = startDestination!!,
+        modifier = Modifier.background(MaterialTheme.colorScheme.background),
         enterTransition = { fadeIn(tween(400)) },
         exitTransition = { fadeOut(tween(400)) },
         popEnterTransition = { fadeIn(tween(400)) },
