@@ -1,7 +1,6 @@
 package com.roomie.app.data.repository
 
 import android.util.Base64
-import android.util.Log
 import com.roomie.app.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

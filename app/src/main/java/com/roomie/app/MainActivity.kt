@@ -1,9 +1,12 @@
 package com.roomie.app
 
 import android.Manifest
+import android.app.AlarmManager
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -44,17 +47,25 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun requestExactAlarmPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+            if (!alarmManager.canScheduleExactAlarms()) {
+                startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         requestNotificationPermissionIfNeeded()
+        requestExactAlarmPermissionIfNeeded()
 
         // TEST
         // val testChoreReminder = OneTimeWorkRequestBuilder<ChoreReminderWorker>().build()
-        // val testOverdueAlert = OneTimeWorkRequestBuilder<OverdueAlertWorker>().build()
         // WorkManager.getInstance(this).enqueue(testChoreReminder)
-        // WorkManager.getInstance(this).enqueue(testOverdueAlert)
 
         splashScreen.setKeepOnScreenCondition {
             authViewModel.startDestination.value == null
