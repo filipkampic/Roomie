@@ -62,7 +62,6 @@ fun ExpensesScreen(
 ) {
     val listState by viewModel.listState.collectAsState()
     val actionState by viewModel.actionState.collectAsState()
-    val balances by viewModel.balances.collectAsState()
     val currentUserId by viewModel.currentUserId.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -79,9 +78,9 @@ fun ExpensesScreen(
         }
     }
 
-    val userBalance = balances[currentUserId] ?: 0.0
-    val youOwe = if (userBalance < 0) -userBalance else 0.0
-    val youAreOwed = if (userBalance > 0) userBalance else 0.0
+    val youOwe by viewModel.youOwe.collectAsState()
+    val youAreOwed by viewModel.youAreOwed.collectAsState()
+    val userBalance = youAreOwed - youOwe
     val totalExpenses = when (val s = listState) {
         is ExpenseListState.Success -> totalHouseholdExpenses(s.expenses)
         else -> 0.0
@@ -214,7 +213,7 @@ fun ExpensesScreen(
                             val members = viewModel.members.collectAsState().value
                             val paidByName = members.find { it.first == expense.paidBy }?.second ?: expense.paidBy
                             val splitCount = expense.splitBetween.size
-                            val userShare = if (currentUserId in expense.splitBetween && splitCount > 0)
+                            val userShare = if (currentUserId in expense.splitBetween && currentUserId !in expense.settledBy &&splitCount > 0)
                                 expense.amount / splitCount else 0.0
 
                             ExpenseItem(

@@ -47,15 +47,19 @@ fun UpcomingChoresSection(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(Dimens.SpaceMD)
             ) {
-                chores.take(2).forEach { chore ->
+                if (chores.size == 1) {
                     UpcomingChoreCard(
-                        chore = chore,
+                        chore = chores[0],
                         modifier = Modifier.weight(1f)
                     )
-                }
-
-                if (chores.size == 1) {
                     Spacer(modifier = Modifier.weight(1f))
+                } else {
+                    chores.take(2).forEach { chore ->
+                        UpcomingChoreCard(
+                            chore = chore,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
             }
         }

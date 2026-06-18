@@ -42,13 +42,13 @@ fun DashboardSummaryGrid(summaryState: DashboardSummaryState) {
             iconBgColor = TealPrimary,
             iconTint = SurfaceWhite,
             value = when {
-                summaryState.netBalance > 0 -> "€${"%.0f".format(summaryState.netBalance)}"
-                summaryState.netBalance < 0 -> "€${"%.0f".format(-summaryState.netBalance)}"
+                summaryState.netBalance > 0 -> "€${"%.2f".format(summaryState.netBalance)}"
+                summaryState.netBalance < 0 -> "€${"%.2f".format(-summaryState.netBalance)}"
                 else -> "€0"
             },
             label = when {
-                summaryState.netBalance > 0 -> "You are owed"
-                summaryState.netBalance < 0 -> "You owe"
+                summaryState.netBalance > 0 -> "Others owe you"
+                summaryState.netBalance < 0 -> "You owe others"
                 else -> "All settled"
             },
             valueColor = when {

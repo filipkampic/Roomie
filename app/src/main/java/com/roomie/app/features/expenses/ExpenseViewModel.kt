@@ -55,6 +55,12 @@ class ExpenseViewModel @Inject constructor(
     private val _balances = MutableStateFlow<Map<String, Double>>(emptyMap())
     val balances: StateFlow<Map<String, Double>> = _balances
 
+    private val _youOwe = MutableStateFlow(0.0)
+    val youOwe: StateFlow<Double> = _youOwe
+
+    private val _youAreOwed = MutableStateFlow(0.0)
+    val youAreOwed: StateFlow<Double> = _youAreOwed
+
     init {
         viewModelScope.launch {
             val uid = authRepository.currentUser?.uid ?: return@launch
@@ -69,21 +75,16 @@ class ExpenseViewModel @Inject constructor(
         }
     }
 
-    private fun loadMembers(householdId: String) {
-        viewModelScope.launch {
-            householdRepository.fetchHousehold(householdId)
-                .onSuccess { household ->
-                    val pairs = mutableListOf<Pair<String, String>>()
-                    for (uid in household.members) {
-                        val name = authRepository.fetchUserName(uid)
-                        if (name != null) pairs.add(uid to name)
-                    }
-                    _members.value = pairs
-
-                    val currentExpenses = (_listState.value as? ExpenseListState.Success)?.expenses
-                    if (currentExpenses != null) recomputeBalances(currentExpenses)
+    private suspend fun loadMembers(householdId: String) {
+        householdRepository.fetchHousehold(householdId)
+            .onSuccess { household ->
+                val pairs = mutableListOf<Pair<String, String>>()
+                for (uid in household.members) {
+                    val name = authRepository.fetchUserName(uid)
+                    if (name != null) pairs.add(uid to name)
                 }
-        }
+                _members.value = pairs
+            }
     }
 
     private fun observeExpenses(householdId: String) {
@@ -100,6 +101,10 @@ class ExpenseViewModel @Inject constructor(
     private fun recomputeBalances(expenses: List<Expense>) {
         val memberUids = _members.value.map { it.first }
         _balances.value = calculateBalances(expenses, memberUids)
+        val owe = calculateYouOwe(expenses, _currentUserId.value)
+        val owed = calculateYouAreOwed(expenses, _currentUserId.value)
+        _youOwe.value = owe
+        _youAreOwed.value = owed
     }
 
     fun addExpense(
@@ -119,7 +124,7 @@ class ExpenseViewModel @Inject constructor(
                 createdBy = uid,
                 paidBy = paidBy,
                 splitBetween = splitBetween,
-                settledBy = if (uid in splitBetween) listOf(uid) else emptyList(),
+                settledBy = emptyList(),
                 date = System.currentTimeMillis(),
                 householdId = hId,
                 category = category

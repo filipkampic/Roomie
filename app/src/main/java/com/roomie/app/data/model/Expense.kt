@@ -16,7 +16,9 @@ data class Expense(
         runCatching { ExpenseCategory.valueOf(category) }.getOrDefault(ExpenseCategory.OTHER)
 
     fun isFullySettled(): Boolean =
-        splitBetween.isNotEmpty() && splitBetween.all { it in settledBy }
+        splitBetween.isNotEmpty() && splitBetween.all { uid ->
+            uid == paidBy || uid in settledBy
+        }
 
     fun isSettledBy(uid: String): Boolean = uid in settledBy
 }

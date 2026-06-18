@@ -178,18 +178,18 @@ fun formatDeadline(deadline: Long): String {
     if (deadline == 0L) return "No deadline"
     val now = Calendar.getInstance()
     val choreDay = Calendar.getInstance().apply { timeInMillis = deadline }
-    val timeStr = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date(deadline))
+    val timeStr = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(deadline))
     return when {
         now.get(Calendar.DAY_OF_YEAR) == choreDay.get(Calendar.DAY_OF_YEAR) &&
                 now.get(Calendar.YEAR) == choreDay.get(Calendar.YEAR) -> "Today • $timeStr"
         now.get(Calendar.DAY_OF_YEAR) + 1 == choreDay.get(Calendar.DAY_OF_YEAR) &&
                 now.get(Calendar.YEAR) == choreDay.get(Calendar.YEAR) -> "Tomorrow • $timeStr"
         choreDay.before(now) -> {
-            val dateStr = SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(deadline))
+            val dateStr = SimpleDateFormat("MMM d", Locale.ENGLISH).format(Date(deadline))
             "$dateStr • $timeStr"
         }
         else -> {
-            val dateStr = SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(deadline))
+            val dateStr = SimpleDateFormat("MMM d", Locale.ENGLISH).format(Date(deadline))
             "$dateStr • $timeStr"
         }
     }

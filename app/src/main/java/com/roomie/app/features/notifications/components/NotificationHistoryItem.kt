@@ -67,6 +67,6 @@ private fun formatTimestamp(timestamp: Long): String {
         diff < 60_000 -> "Just now"
         diff < 3_600_000 -> "${diff / 60_000}m ago"
         diff < 86_400_000 -> "${diff / 3_600_000}h ago"
-        else -> SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(timestamp))
+        else -> SimpleDateFormat("MMM d", Locale.ENGLISH).format(Date(timestamp))
     }
 }

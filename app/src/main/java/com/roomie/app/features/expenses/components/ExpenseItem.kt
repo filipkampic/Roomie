@@ -237,7 +237,7 @@ fun ExpenseItem(
 
 fun formatExpenseDate(timestamp: Long): String {
     if (timestamp == 0L) return ""
-    val sdf = SimpleDateFormat("MMM d", Locale.getDefault())
+    val sdf = SimpleDateFormat("MMM d", Locale.ENGLISH)
     return sdf.format(Date(timestamp))
 }
 

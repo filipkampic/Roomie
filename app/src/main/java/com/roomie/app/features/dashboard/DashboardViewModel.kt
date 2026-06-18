@@ -108,7 +108,7 @@ class DashboardViewModel @Inject constructor(
                         overdueChores = chores.count { !it.completed && it.deadline > 0 && it.deadline < now }
                     )
 
-                    val dateFormatter = SimpleDateFormat("MMM d, HH:mm", Locale.getDefault())
+                    val dateFormatter = SimpleDateFormat("MMM d, HH:mm", Locale.ENGLISH)
                     _upcomingChores.value = chores
                         .filter { !it.completed && it.deadline > 0 }
                         .sortedBy { it.deadline }
@@ -121,7 +121,7 @@ class DashboardViewModel @Inject constructor(
                             )
                         }
 
-                val expDateFormatter = SimpleDateFormat("MMM d", Locale.getDefault())
+                val expDateFormatter = SimpleDateFormat("MMM d", Locale.ENGLISH)
                 _recentExpenses.value = expenses
                     .take(3)
                     .map { expense ->

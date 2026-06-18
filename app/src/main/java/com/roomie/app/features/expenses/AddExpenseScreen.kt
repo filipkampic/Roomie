@@ -1,5 +1,6 @@
 package com.roomie.app.features.expenses
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -205,15 +206,23 @@ fun AddExpenseScreen(
                         )
                         ExposedDropdownMenu(
                             expanded = paidByDropdownExpanded,
-                            onDismissRequest = { paidByDropdownExpanded = false }
+                            onDismissRequest = { paidByDropdownExpanded = false },
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                         ) {
                             members.forEach { member ->
                                 DropdownMenuItem(
-                                    text = { Text(member.second) },
+                                    text = {
+                                        Text(
+                                            text = member.second,
+                                            style = RoomieTypography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    },
                                     onClick = {
                                         paidBy = member
                                         paidByDropdownExpanded = false
-                                    }
+                                    },
+                                    modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                                 )
                             }
                         }
